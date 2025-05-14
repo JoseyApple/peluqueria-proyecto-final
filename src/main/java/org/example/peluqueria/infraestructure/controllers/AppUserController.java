@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.peluqueria.application.service.appuser.AppUserService;
 import org.example.peluqueria.domain.models.AppUser;
 import org.example.peluqueria.infraestructure.dto.PageOutDto;
+import org.example.peluqueria.infraestructure.dto.appUser.AppUserCreateDto;
 import org.example.peluqueria.infraestructure.dto.appUser.AppUserDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +26,9 @@ public class AppUserController {
     }
 
     @PostMapping
-    public ResponseEntity<AppUserDto> createUser(@RequestBody AppUserDto userDto) {
-        AppUser userToCreate = userDto.toEntity();
-        AppUser createdUser = appUserService.createUser(userToCreate);
-        return ResponseEntity.ok(AppUserDto.fromEntity(createdUser));
+    public ResponseEntity<AppUserDto> createUser(@RequestBody AppUserCreateDto dto) {
+        AppUser createdUser = appUserService.createUser(dto.toEntity());
+        return new ResponseEntity<>(AppUserDto.fromEntity(createdUser), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}/status")
@@ -54,3 +55,4 @@ public class AppUserController {
         return ResponseEntity.ok(response);
     }
 }
+
