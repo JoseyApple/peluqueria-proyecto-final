@@ -36,11 +36,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		// Sólo saltar CORS y rutas públicas de login/h2
 		if (CorsUtils.isPreFlightRequest(request)
 				|| path.startsWith("/auth/")
-				|| path.startsWith("/h2-console/")) {
+				|| path.startsWith("/h2-console/")
+				|| (path.startsWith("/users") && "POST".equalsIgnoreCase(method))) {
 			filterChain.doFilter(request, response);
 			return;
 		}
-
 		// A PARTIR DE AQUÍ, procesar TODOS los métodos, incluidos GET
 		String authHeader = request.getHeader("Authorization");
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
