@@ -22,6 +22,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
@@ -35,24 +37,27 @@ public class SecurityConfiguration {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
+				.cors(cors -> cors.configurationSource(request -> {
+					var config = new org.springframework.web.cors.CorsConfiguration();
+					config.setAllowedOrigins(List.of("http://localhost:5173"));
+					config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+					config.setAllowedHeaders(List.of("*"));
+					config.setAllowCredentials(true);
+					return config;
+				}))
 				.csrf(AbstractHttpConfigurer::disable)
 				.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/h2-console/**", "/auth/**").permitAll() // Login, consola H2 públicas
-
-						.requestMatchers(HttpMethod.GET, "/services/**").permitAll() // Cualquier usuario puede ver servicios
-
-						.requestMatchers(HttpMethod.GET, "/appointments/client/**").hasAnyRole("USER", "ADMIN") // Ver sus citas
-						.requestMatchers(HttpMethod.POST, "/appointments").hasAnyRole("USER", "ADMIN") // Crear cita
-						.requestMatchers(HttpMethod.DELETE, "/appointments/**").hasAnyRole("USER", "ADMIN") // Cancelar cita
-
-						.requestMatchers(HttpMethod.GET, "/appointments").hasRole("ADMIN") // Listar todas las citas → solo admin
-
-						.requestMatchers(HttpMethod.POST, "/orders/**").hasAnyRole("USER", "ADMIN") // Crear order
-						.requestMatchers(HttpMethod.PATCH, "/orders/**").hasAnyRole("USER", "ADMIN") // Pagar order
-						.requestMatchers(HttpMethod.GET, "/orders/client/**").hasAnyRole("USER", "ADMIN") // Ver orders
-
-						.anyRequest().hasRole("ADMIN") // Por defecto, solo admin
+						.requestMatchers("/h2-console/**", "/auth/**").permitAll()
+						.requestMatchers(HttpMethod.GET, "/services/**").permitAll()
+						.requestMatchers(HttpMethod.GET, "/appointments/client/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers(HttpMethod.POST, "/appointments").hasAnyRole("USER", "ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/appointments/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers(HttpMethod.GET, "/appointments").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, "/orders/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers(HttpMethod.PATCH, "/orders/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers(HttpMethod.GET, "/orders/client/**").hasAnyRole("USER", "ADMIN")
+						.anyRequest().hasRole("ADMIN")
 				)
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 				.exceptionHandling(this::configureExceptionHandling);
