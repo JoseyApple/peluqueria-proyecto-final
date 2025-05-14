@@ -6,10 +6,12 @@ import org.example.peluqueria.domain.models.AppUser;
 import org.example.peluqueria.infraestructure.dto.PageOutDto;
 import org.example.peluqueria.infraestructure.dto.appUser.AppUserCreateDto;
 import org.example.peluqueria.infraestructure.dto.appUser.AppUserDto;
+import org.example.peluqueria.infraestructure.security.UserPrincipal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -53,6 +55,12 @@ public class AppUserController {
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AppUserDto> getCurrentUser(@AuthenticationPrincipal UserPrincipal principal) {
+        AppUser user = appUserService.findById(principal.getId());
+        return ResponseEntity.ok(AppUserDto.fromEntity(user));
     }
 }
 
