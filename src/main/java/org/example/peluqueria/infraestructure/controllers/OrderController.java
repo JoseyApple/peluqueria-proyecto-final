@@ -66,5 +66,28 @@ public class OrderController {
         return ResponseEntity.ok(OrderResponseDto.fromEntity(orderService.getOrderByAppIdAndOrderId(clientId, idOrder)));
     }
 
+    @GetMapping
+    public ResponseEntity<PageOutDto<OrderResponseDto>> getOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Order> orderPage = orderService.findAllorders(pageable);
+
+        List<OrderResponseDto> content = orderPage.getContent()
+                .stream()
+                .map(OrderResponseDto::fromEntity)
+                .toList();
+
+        PageOutDto<OrderResponseDto> response = new PageOutDto<>(
+                orderPage.getNumber(),
+                orderPage.getSize(),
+                orderPage.getTotalElements(),
+                orderPage.getTotalPages(),
+                content
+        );
+
+        return ResponseEntity.ok(response);
+
+    }
 }

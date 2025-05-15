@@ -85,5 +85,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentRepository.findByClient(client, pageable);
     }
 
+    @Override
+    public Page<Appointment> findall(Pageable pageable) {
+        return appointmentRepository.findAll(pageable);
+    }
+
 
 }

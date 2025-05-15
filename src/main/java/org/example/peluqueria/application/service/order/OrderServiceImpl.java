@@ -81,5 +81,11 @@ public class OrderServiceImpl implements OrderService {
         }
         return order;
     }
+
+    @Override
+    public Page<Order> findAllorders(Pageable pageable) {
+
+        return orderRepository.findAll(pageable);
+    }
 }
 

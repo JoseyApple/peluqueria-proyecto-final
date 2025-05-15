@@ -77,4 +77,28 @@ public class AppointmentController {
         appointmentService.cancelAppointment(appointmentId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping
+    public ResponseEntity<PageOutDto<AppointmentResponseDto>> getAppointments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").descending());
+        Page<Appointment> appointmentPage = appointmentService.findall(pageable);
+
+        List<AppointmentResponseDto> content = appointmentPage.getContent()
+                .stream()
+                .map(AppointmentResponseDto::fromEntity)
+                .toList();
+
+        PageOutDto<AppointmentResponseDto> response = new PageOutDto<>(
+                appointmentPage.getNumber(),
+                appointmentPage.getSize(),
+                appointmentPage.getTotalElements(),
+                appointmentPage.getTotalPages(),
+                content
+        );
+
+        return ResponseEntity.ok(response);
+    }
 }

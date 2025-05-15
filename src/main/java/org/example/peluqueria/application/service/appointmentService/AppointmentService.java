@@ -11,4 +11,6 @@ public interface AppointmentService {
     void cancelAppointment(Long appointmentId);
 
     Page<Appointment> getAppointmentsByClient(Long clientId, Pageable pageable);
+
+    Page<Appointment> findall(Pageable pageable);
 }
