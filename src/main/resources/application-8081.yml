@@ -1,3 +1,4 @@
+
 spring:
  application:
   name: peluqueria
@@ -20,11 +21,11 @@ spring:
   database-platform: org.hibernate.dialect.H2Dialect
   defer-datasource-initialization: true
   hibernate:
-   ddl-auto: create-drop
+   ddl-auto: update
 
  sql:
   init:
-   mode: always
+   mode: never
 
 server:
  port: 8081
