@@ -25,7 +25,7 @@ spring:
 
  sql:
   init:
-   mode: never
+   mode: always
 
 server:
  port: 8081

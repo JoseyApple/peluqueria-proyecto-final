@@ -75,8 +75,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getOrderByAppIdAndOrderId(Long appId, Long orderId) {
-
-        return orderRepository.findByIdAndClient_Id(appId, orderId);
+        Order order = orderRepository.findByIdAndClient_Id(orderId, appId);
+        if (order == null) {
+            throw new EntityNotFoundException("Order not found with id: " + orderId + " and clientId: " + appId);
+        }
+        return order;
     }
 }
 
