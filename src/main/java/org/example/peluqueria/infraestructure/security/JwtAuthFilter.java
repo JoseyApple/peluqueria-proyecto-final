@@ -37,7 +37,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 				|| path.startsWith("/auth/")
 				|| path.startsWith("/h2-console/")
 				|| (path.equals("/users") && "POST".equalsIgnoreCase(method))
-				|| path.startsWith("/orders")
 		){
 			// Solo permitir POST /users sin token (registro)
 			filterChain.doFilter(request, response);
