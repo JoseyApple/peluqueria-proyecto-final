@@ -33,11 +33,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		String path = request.getRequestURI();
 		String method = request.getMethod();
 
-		// Sólo saltar CORS y rutas públicas de login/h2
 		if (CorsUtils.isPreFlightRequest(request)
 				|| path.startsWith("/auth/")
 				|| path.startsWith("/h2-console/")
-				|| (path.startsWith("/users") && "POST".equalsIgnoreCase(method))) {
+				|| (path.equals("/users") && "POST".equalsIgnoreCase(method))) {
+			// Solo permitir POST /users sin token (registro)
 			filterChain.doFilter(request, response);
 			return;
 		}
