@@ -37,23 +37,28 @@ public class SecurityConfiguration {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
+				.cors(cors -> cors.configurationSource(request -> {
+					var config = new org.springframework.web.cors.CorsConfiguration();
+					config.setAllowedOrigins(List.of("http://localhost:5173")); // FRONTEND ORIGIN
+					config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+					config.setAllowedHeaders(List.of("*"));
+					config.setAllowCredentials(true);
+					return config;
+				}))
 				.csrf(AbstractHttpConfigurer::disable)
 				.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/h2-console/**", "/auth/**").permitAll()
 						.requestMatchers(HttpMethod.POST, "/users").permitAll()
-						.requestMatchers(HttpMethod.GET, "/users/me").permitAll()
+						.requestMatchers(HttpMethod.GET, "/users/me").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.GET, "/services/**").permitAll()
 						.requestMatchers(HttpMethod.GET, "/appointments/client/**").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.POST, "/appointments").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.DELETE, "/appointments/**").hasAnyRole("USER", "ADMIN")
-
 						.requestMatchers(HttpMethod.GET, "/appointments").hasRole("ADMIN")
-
 						.requestMatchers(HttpMethod.POST, "/orders/**").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.PATCH, "/orders/**").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.GET, "/orders/client/**").hasAnyRole("USER", "ADMIN")
-
 						.anyRequest().hasRole("ADMIN") // 🔒 Todo lo demás protegido
 				)
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
