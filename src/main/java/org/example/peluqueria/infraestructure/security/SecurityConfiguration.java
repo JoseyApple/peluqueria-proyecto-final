@@ -50,7 +50,7 @@ public class SecurityConfiguration {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/h2-console/**", "/auth/**").permitAll()
 						.requestMatchers(HttpMethod.POST, "/users").permitAll()
-						.requestMatchers(HttpMethod.GET, "/users/me").permitAll()
+						.requestMatchers(HttpMethod.GET, "/users/me").authenticated()
 						.requestMatchers(HttpMethod.GET, "/services/**").permitAll()
 						.requestMatchers(HttpMethod.GET, "/appointments/client/**").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.POST, "/appointments").hasAnyRole("USER", "ADMIN")
