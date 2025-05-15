@@ -10,4 +10,6 @@ public interface OrderService {
     void markOrderAsPaid(Long orderId);
 
     Page<Order> getOrdersByClient(Long clientId, Pageable pageable);
+
+    Order getOrderByAppIdAndOrderId(Long appId, Long orderId);
 }

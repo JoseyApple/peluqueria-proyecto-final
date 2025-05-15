@@ -72,5 +72,11 @@ public class OrderServiceImpl implements OrderService {
         AppUser client = appUserService.findById(clientId);
         return orderRepository.findByClient(client, pageable);
     }
+
+    @Override
+    public Order getOrderByAppIdAndOrderId(Long appId, Long orderId) {
+
+        return orderRepository.findByIdAndClient_Id(appId, orderId);
+    }
 }
 
