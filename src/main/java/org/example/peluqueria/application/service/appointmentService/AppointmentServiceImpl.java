@@ -32,6 +32,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (appointment.getServices() == null || appointment.getServices().isEmpty()) {
             throw new IllegalArgumentException("Debe seleccionar al menos un servicio.");
         }
+        System.out.println(appointment.getServices().size());
 
         // Calcular duración total de los servicios
         int totalDurationMinutes = appointment.getServices()
@@ -68,6 +69,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public void cancelAppointment(Long appointmentId) {
+
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment no encontrado."));
 
@@ -92,12 +94,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public void completeAppointment(Long appointmentId) {
+
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment no encontrado."));
 
-        if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
-            throw new IllegalStateException("No se puede completar una cita cancelada.");
-        }
 
         if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
             throw new IllegalStateException("La cita ya está marcada como completada.");
@@ -106,6 +106,4 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setStatus(AppointmentStatus.COMPLETED);
         appointmentRepository.save(appointment);
     }
-
-
 }

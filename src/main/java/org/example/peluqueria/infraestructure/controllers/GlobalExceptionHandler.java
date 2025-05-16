@@ -96,7 +96,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value ={
-            IllegalArgumentException.class
+            IllegalArgumentException.class,
+            IllegalStateException.class
     })
     protected ResponseEntity<ErrorOutDto> handleValidationExceptions(Exception ex) {
 
