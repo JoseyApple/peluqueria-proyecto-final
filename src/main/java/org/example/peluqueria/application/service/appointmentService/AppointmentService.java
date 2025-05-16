@@ -13,4 +13,6 @@ public interface AppointmentService {
     Page<Appointment> getAppointmentsByClient(Long clientId, Pageable pageable);
 
     Page<Appointment> findall(Pageable pageable);
+
+    void completeAppointment(Long appointmentId);
 }

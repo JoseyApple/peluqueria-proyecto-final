@@ -78,6 +78,12 @@ public class AppointmentController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{appointmentId}/complete")
+    public ResponseEntity<Void> completeAppointment(@PathVariable Long appointmentId) {
+        appointmentService.completeAppointment(appointmentId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping
     public ResponseEntity<PageOutDto<AppointmentResponseDto>> getAppointments(
             @RequestParam(defaultValue = "0") int page,

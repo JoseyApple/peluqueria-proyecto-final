@@ -51,9 +51,9 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new IllegalArgumentException("La cita está fuera del horario de apertura.");
         }
 
-        // Validar conflictos con otras citas existentes
-        boolean conflict = appointmentRepository.existsByStartTimeLessThanAndEndTimeGreaterThan(
-                endDateTime, startDateTime);
+        // Validar conflictos con otras citas existentes (ignorando las canceladas)
+        boolean conflict = appointmentRepository.existsByStartTimeLessThanAndEndTimeGreaterThanAndStatusNot(
+                endDateTime, startDateTime, AppointmentStatus.CANCELLED);
 
         if (conflict) {
             throw new IllegalArgumentException("Conflicto de horarios. Ya existe una cita en ese rango.");
@@ -71,11 +71,11 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment no encontrado."));
 
-        if (appointment.getStatus() == AppointmentStatus.CANCELED) {
+        if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
             throw new IllegalStateException("La cita ya está cancelada.");
         }
 
-        appointment.setStatus(AppointmentStatus.CANCELED);
+        appointment.setStatus(AppointmentStatus.CANCELLED);
         appointmentRepository.save(appointment);
     }
 
@@ -88,6 +88,23 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Page<Appointment> findall(Pageable pageable) {
         return appointmentRepository.findAll(pageable);
+    }
+
+    @Override
+    public void completeAppointment(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Appointment no encontrado."));
+
+        if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
+            throw new IllegalStateException("No se puede completar una cita cancelada.");
+        }
+
+        if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new IllegalStateException("La cita ya está marcada como completada.");
+        }
+
+        appointment.setStatus(AppointmentStatus.COMPLETED);
+        appointmentRepository.save(appointment);
     }
 
 

@@ -6,8 +6,14 @@ import org.example.peluqueria.domain.models.HairdressingService;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record AppointmentResponseDto(Long id, LocalDateTime startTime, LocalDateTime endTime, List<String> services, String status) {
-
+public record AppointmentResponseDto(
+        Long id,
+        LocalDateTime startTime,
+        LocalDateTime endTime,
+        List<String> services,
+        String status,
+        Long orderId
+) {
     public static AppointmentResponseDto fromEntity(Appointment appointment) {
         List<String> serviceNames = appointment.getServices()
                 .stream()
@@ -19,7 +25,9 @@ public record AppointmentResponseDto(Long id, LocalDateTime startTime, LocalDate
                 appointment.getStartTime(),
                 appointment.getEndTime(),
                 serviceNames,
-                appointment.getStatus().name()
+                appointment.getStatus().name(),
+                appointment.getOrder() != null ? appointment.getOrder().getId() : null
         );
     }
 }
+

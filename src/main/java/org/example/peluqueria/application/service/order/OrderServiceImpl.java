@@ -68,6 +68,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Orden no encontrada."));
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("La orden ya está cancelada.");
+        }
+
+        if (order.getStatus() == OrderStatus.PAID) {
+            throw new IllegalStateException("No se puede cancelar una orden ya pagada.");
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
+    }
+
+
+    @Override
     public Page<Order> getOrdersByClient(Long clientId, Pageable pageable) {
         AppUser client = appUserService.findById(clientId);
         return orderRepository.findByClient(client, pageable);
