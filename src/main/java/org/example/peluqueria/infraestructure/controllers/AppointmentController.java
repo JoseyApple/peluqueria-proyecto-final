@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.peluqueria.application.service.appointmentService.AppointmentService;
 import org.example.peluqueria.application.service.appuser.AppUserService;
 import org.example.peluqueria.domain.AppointmentStatus;
+import org.example.peluqueria.domain.OrderStatus;
 import org.example.peluqueria.domain.models.AppUser;
 import org.example.peluqueria.domain.models.Appointment;
 import org.example.peluqueria.domain.models.HairdressingService;
+import org.example.peluqueria.infraestructure.criteriabuilders.AppointmentCriteriaBuilder;
 import org.example.peluqueria.infraestructure.dto.PageOutDto;
 import org.example.peluqueria.infraestructure.dto.appointment.AppointmentResponseDto;
 import org.example.peluqueria.infraestructure.dto.appointment.CreateAppointmentDto;
@@ -17,11 +19,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -33,6 +40,7 @@ public class AppointmentController {
     private final AppUserService appUserService;
     private final HairdressingServiceRepository hairdressingServiceRepository;
     private final SecurityUtils securityUtils;
+    private final AppointmentCriteriaBuilder appointmentCriteriaBuilder;
 
     @PostMapping
     public ResponseEntity<AppointmentResponseDto> createAppointment(
@@ -57,54 +65,63 @@ public class AppointmentController {
     }
 
 
-    @GetMapping("/client/{clientId}")
-    public ResponseEntity<PageOutDto<AppointmentResponseDto>> getAppointmentsByClient(
-            @PathVariable Long clientId,
+    @GetMapping("/search")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PageOutDto<AppointmentResponseDto>> searchAppointments(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startHour,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endHour,
+            @RequestParam(required = false) AppointmentStatus status,
+            @RequestParam(required = false) String clientEmail,
+            @RequestParam(required = false) OrderStatus orderStatus,
+            @RequestParam(required = false) BigDecimal minOrderTotal,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        // Obtener datos desde DAO
+        return getPageOutDtoResponseEntity(startDate, endDate, startHour, endHour, status, orderStatus, minOrderTotal, page, size, clientEmail);
+    }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").descending());
-        Page<Appointment> appointmentPage = appointmentService.getAppointmentsByClient(clientId, pageable);
+    @GetMapping("/my-appointments/search")
+    public ResponseEntity<PageOutDto<AppointmentResponseDto>> searchMyAppointments(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startHour,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endHour,
+            @RequestParam(required = false) AppointmentStatus status,
+            @RequestParam(required = false) OrderStatus orderStatus,
+            @RequestParam(required = false) BigDecimal minOrderTotal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal UserPrincipal user
+    ) {
+        String clientEmail = user.getUsername(); // El email del usuario autenticado
 
-        List<AppointmentResponseDto> content = appointmentPage.getContent()
-                .stream()
+        return getPageOutDtoResponseEntity(startDate, endDate, startHour, endHour, status, orderStatus, minOrderTotal, page, size, clientEmail);
+    }
+
+    private ResponseEntity<PageOutDto<AppointmentResponseDto>> getPageOutDtoResponseEntity(@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(required = false) LocalDate startDate, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(required = false) LocalDate endDate, @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) @RequestParam(required = false) LocalTime startHour, @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) @RequestParam(required = false) LocalTime endHour, @RequestParam(required = false) AppointmentStatus status, @RequestParam(required = false) OrderStatus orderStatus, @RequestParam(required = false) BigDecimal minOrderTotal, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, String clientEmail) {
+        List<Appointment> appointments = appointmentCriteriaBuilder.findAllWithFilters(
+                startDate, endDate, startHour, endHour, status, clientEmail, orderStatus, minOrderTotal,
+                page, size
+        );
+
+        long totalElements = appointmentCriteriaBuilder.countWithFilters(
+                startDate, endDate, startHour, endHour, status, clientEmail, orderStatus, minOrderTotal
+        );
+
+        List<AppointmentResponseDto> content = appointments.stream()
                 .map(AppointmentResponseDto::fromEntity)
                 .toList();
 
         PageOutDto<AppointmentResponseDto> response = new PageOutDto<>(
-                appointmentPage.getNumber(),
-                appointmentPage.getSize(),
-                appointmentPage.getTotalElements(),
-                appointmentPage.getTotalPages(),
-                content
+                page, size, totalElements, (int) Math.ceil((double) totalElements / size), content
         );
 
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<PageOutDto<AppointmentResponseDto>> getAppointments(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").descending());
-        Page<Appointment> appointmentPage = appointmentService.findall(pageable);
-
-        List<AppointmentResponseDto> content = appointmentPage.getContent()
-                .stream()
-                .map(AppointmentResponseDto::fromEntity)
-                .toList();
-
-        PageOutDto<AppointmentResponseDto> response = new PageOutDto<>(
-                appointmentPage.getNumber(),
-                appointmentPage.getSize(),
-                appointmentPage.getTotalElements(),
-                appointmentPage.getTotalPages(),
-                content
-        );
-
-        return ResponseEntity.ok(response);
-    }
 
     @PatchMapping("/appointments/{id}/status")
     public ResponseEntity<Void> updateAppointmentStatus(
