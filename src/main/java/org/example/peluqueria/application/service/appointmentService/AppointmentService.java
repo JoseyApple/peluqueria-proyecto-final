@@ -1,5 +1,6 @@
 package org.example.peluqueria.application.service.appointmentService;
 
+import org.example.peluqueria.domain.AppointmentStatus;
 import org.example.peluqueria.domain.models.Appointment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,11 +9,10 @@ public interface AppointmentService {
 
     Appointment createAppointment(Appointment appointment);
 
-    void cancelAppointment(Long appointmentId);
+    void changeAppointmentStatus(Long appointmentId, AppointmentStatus newStatus);
 
     Page<Appointment> getAppointmentsByClient(Long clientId, Pageable pageable);
 
     Page<Appointment> findall(Pageable pageable);
 
-    void completeAppointment(Long appointmentId);
 }

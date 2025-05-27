@@ -2,6 +2,7 @@ package org.example.peluqueria.infraestructure.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.example.peluqueria.application.service.order.OrderService;
+import org.example.peluqueria.domain.OrderStatus;
 import org.example.peluqueria.domain.models.Order;
 import org.example.peluqueria.infraestructure.dto.PageOutDto;
 import org.example.peluqueria.infraestructure.dto.order.OrderResponseDto;
@@ -29,18 +30,14 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PatchMapping("/{orderId}/cancel")
-    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
-        orderService.cancelOrder(orderId);
+    @PatchMapping("/orders/{id}/status")
+    public ResponseEntity<Void> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestParam("newStatus") OrderStatus newStatus) {
+
+        orderService.changeOrderStatus(id, newStatus);
         return ResponseEntity.noContent().build();
     }
-
-    @PatchMapping("/{orderId}/pay")
-    public ResponseEntity<Void> markOrderAsPaid(@PathVariable Long orderId) {
-        orderService.markOrderAsPaid(orderId);
-        return ResponseEntity.noContent().build();
-    }
-
 
     @GetMapping("/client/{clientId}")
     public ResponseEntity<PageOutDto<OrderResponseDto>> getOrdersByClient(

@@ -68,18 +68,31 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public void cancelAppointment(Long appointmentId) {
-
+    public void changeAppointmentStatus(Long appointmentId, AppointmentStatus newStatus) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Appointment no encontrado."));
+                .orElseThrow(() -> new EntityNotFoundException("Cita no encontrada."));
 
-        if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
-            throw new IllegalStateException("La cita ya está cancelada.");
+        AppointmentStatus currentStatus = appointment.getStatus();
+
+        if (currentStatus == newStatus) {
+            throw new IllegalStateException("La cita ya está en el estado solicitado.");
         }
 
-        appointment.setStatus(AppointmentStatus.CANCELLED);
+        // Lógica de transición válida
+        if (currentStatus == AppointmentStatus.CANCELLED) {
+            throw new IllegalStateException("No se puede cambiar el estado de una cita cancelada.");
+        }
+
+        if (currentStatus == AppointmentStatus.COMPLETED && newStatus != AppointmentStatus.CANCELLED) {
+            throw new IllegalStateException("No se puede modificar una cita completada.");
+        }
+
+        // Agrega más reglas si quieres restringir otras transiciones
+
+        appointment.setStatus(newStatus);
         appointmentRepository.save(appointment);
     }
+
 
     @Override
     public Page<Appointment> getAppointmentsByClient(Long clientId, Pageable pageable) {
@@ -92,18 +105,4 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentRepository.findAll(pageable);
     }
 
-    @Override
-    public void completeAppointment(Long appointmentId) {
-
-        Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Appointment no encontrado."));
-
-
-        if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            throw new IllegalStateException("La cita ya está marcada como completada.");
-        }
-
-        appointment.setStatus(AppointmentStatus.COMPLETED);
-        appointmentRepository.save(appointment);
-    }
 }

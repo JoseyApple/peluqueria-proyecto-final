@@ -55,35 +55,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void markOrderAsPaid(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado."));
-
-        if (order.getStatus() == OrderStatus.PAID) {
-            throw new IllegalStateException("El pedido ya está pagado.");
-        }
-
-        order.setStatus(OrderStatus.PAID);
-        orderRepository.save(order);
-    }
-
-    @Override
-    public void cancelOrder(Long orderId) {
+    public void changeOrderStatus(Long orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Orden no encontrada."));
 
-        if (order.getStatus() == OrderStatus.CANCELLED) {
-            throw new IllegalStateException("La orden ya está cancelada.");
+        OrderStatus currentStatus = order.getStatus();
+
+        if (currentStatus == newStatus) {
+            throw new IllegalStateException("La orden ya está en el estado solicitado.");
         }
 
-        if (order.getStatus() == OrderStatus.PAID) {
-            throw new IllegalStateException("No se puede cancelar una orden ya pagada.");
-        }
-
-        order.setStatus(OrderStatus.CANCELLED);
+        order.setStatus(newStatus);
         orderRepository.save(order);
     }
-
 
     @Override
     public Page<Order> getOrdersByClient(Long clientId, Pageable pageable) {
