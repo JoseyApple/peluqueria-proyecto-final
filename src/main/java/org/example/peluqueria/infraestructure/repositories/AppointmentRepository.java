@@ -21,5 +21,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             LocalDateTime endTime, LocalDateTime startTime, AppointmentStatus status);
 
     int countAllByStatusAndStartTimeBetween(AppointmentStatus status, LocalDateTime start, LocalDateTime end);
+    int deleteByStatusAndStartTimeBefore(AppointmentStatus status, LocalDateTime time);
 
 }
