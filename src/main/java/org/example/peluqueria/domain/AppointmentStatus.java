@@ -1,7 +1,8 @@
 package org.example.peluqueria.domain;
 
 public enum AppointmentStatus {
-    RESERVED,
+    PENDING,
+    CONFIRMED,
     COMPLETED,
     CANCELLED
 }

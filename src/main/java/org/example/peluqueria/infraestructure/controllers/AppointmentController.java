@@ -123,13 +123,20 @@ public class AppointmentController {
     }
 
 
-    @PatchMapping("/appointments/{id}/status")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateAppointmentStatus(
             @PathVariable Long id,
             @RequestParam AppointmentStatus newStatus) {
 
         appointmentService.changeAppointmentStatus(id, newStatus);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/pending-appointments/{date}")
+    public ResponseEntity<Integer> getPendingAppointments(
+            @RequestParam LocalDate date) {
+
+        return ResponseEntity.ok(appointmentService.contarCitasPendientesDelDia(date));
     }
 
 }

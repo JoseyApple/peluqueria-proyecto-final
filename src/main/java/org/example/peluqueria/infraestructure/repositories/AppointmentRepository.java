@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Repository
@@ -18,5 +19,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     Page<Appointment> findByClient(AppUser client, Pageable pageable);
     boolean existsByStartTimeLessThanAndEndTimeGreaterThanAndStatusNot(
             LocalDateTime endTime, LocalDateTime startTime, AppointmentStatus status);
+
+    int countAllByStatusAndStartTimeBetween(AppointmentStatus status, LocalDateTime start, LocalDateTime end);
 
 }

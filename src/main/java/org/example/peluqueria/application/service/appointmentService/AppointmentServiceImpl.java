@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -61,7 +62,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         // Establecer estado inicial
-        appointment.setStatus(AppointmentStatus.RESERVED);
+        appointment.setStatus(AppointmentStatus.PENDING);
 
         // Guardar la cita en base de datos
         return appointmentRepository.save(appointment);
@@ -87,8 +88,6 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new IllegalStateException("No se puede modificar una cita completada.");
         }
 
-        // Agrega más reglas si quieres restringir otras transiciones
-
         appointment.setStatus(newStatus);
         appointmentRepository.save(appointment);
     }
@@ -104,5 +103,17 @@ public class AppointmentServiceImpl implements AppointmentService {
     public Page<Appointment> findall(Pageable pageable) {
         return appointmentRepository.findAll(pageable);
     }
+
+    @Override
+    public int contarCitasPendientesDelDia(LocalDate fecha) {
+        LocalDateTime inicio = fecha.atStartOfDay();         // 00:00
+        LocalDateTime fin = fecha.atTime(23, 59, 59);        // 23:59:59
+
+        return appointmentRepository.countAllByStatusAndStartTimeBetween(
+                AppointmentStatus.PENDING, inicio, fin
+        );
+    }
+
+
 
 }

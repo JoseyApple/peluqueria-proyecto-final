@@ -5,6 +5,8 @@ import org.example.peluqueria.domain.models.Appointment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+
 public interface AppointmentService {
 
     Appointment createAppointment(Appointment appointment);
@@ -15,4 +17,5 @@ public interface AppointmentService {
 
     Page<Appointment> findall(Pageable pageable);
 
+    int contarCitasPendientesDelDia(LocalDate fecha);
 }
