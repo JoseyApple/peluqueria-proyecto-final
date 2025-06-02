@@ -6,6 +6,9 @@ import org.example.peluqueria.domain.models.Appointment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -21,6 +24,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             LocalDateTime endTime, LocalDateTime startTime, AppointmentStatus status);
 
     int countAllByStatusAndStartTimeBetween(AppointmentStatus status, LocalDateTime start, LocalDateTime end);
-    int deleteByStatusAndStartTimeBefore(AppointmentStatus status, LocalDateTime time);
+
+    @Modifying
+    @Query("UPDATE Appointment a SET a.status = :newStatus WHERE a.status = :oldStatus AND a.startTime < :ahora")
+    int marcarComoExpiradas(@Param("oldStatus") AppointmentStatus oldStatus,
+                            @Param("newStatus") AppointmentStatus newStatus,
+                            @Param("ahora") LocalDateTime ahora);
+
 
 }
