@@ -1,5 +1,7 @@
 package org.example.peluqueria.infraestructure.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.peluqueria.application.service.appointmentService.AppointmentService;
 import org.example.peluqueria.application.service.appuser.AppUserService;
@@ -33,6 +35,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/appointments")
+@Tag(name = "CITAS", description = "Operaciones relacionadas con citas")
 @RequiredArgsConstructor
 public class AppointmentController {
 
@@ -43,6 +46,10 @@ public class AppointmentController {
     private final AppointmentCriteriaBuilder appointmentCriteriaBuilder;
 
     @PostMapping
+    @Operation(
+            summary = "Crear una cita",
+            description = "Permite a un cliente o un administrador crear una nueva cita con los servicios seleccionados y la hora de inicio."
+    )
     public ResponseEntity<AppointmentResponseDto> createAppointment(
             @RequestBody CreateAppointmentDto dto,
             @AuthenticationPrincipal UserPrincipal currentUser) {
@@ -67,6 +74,10 @@ public class AppointmentController {
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Buscar citas (ADMIN)",
+            description = "Permite a un administrador buscar citas filtrando por fecha, hora, estado, correo del cliente, estado del pedido y monto mínimo del pedido, con paginación."
+    )
     public ResponseEntity<PageOutDto<AppointmentResponseDto>> searchAppointments(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -79,11 +90,14 @@ public class AppointmentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        // Obtener datos desde DAO
         return getPageOutDtoResponseEntity(startDate, endDate, startHour, endHour, status, orderStatus, minOrderTotal, page, size, clientEmail);
     }
 
     @GetMapping("/my-appointments/search")
+    @Operation(
+            summary = "Buscar mis citas",
+            description = "Permite a un usuario autenticado buscar sus propias citas con filtros por fecha, hora, estado, pedido y total mínimo, incluyendo paginación."
+    )
     public ResponseEntity<PageOutDto<AppointmentResponseDto>> searchMyAppointments(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -96,15 +110,44 @@ public class AppointmentController {
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        String clientEmail = user.getUsername(); // El email del usuario autenticado
-
+        String clientEmail = user.getUsername();
         return getPageOutDtoResponseEntity(startDate, endDate, startHour, endHour, status, orderStatus, minOrderTotal, page, size, clientEmail);
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(
+            summary = "Actualizar estado de una cita",
+            description = "Permite modificar el estado de una cita existente (por ejemplo, cambiar a CONFIRMED o CANCELLED) mediante su ID."
+    )
+    public ResponseEntity<Void> updateAppointmentStatus(
+            @PathVariable Long id,
+            @RequestParam AppointmentStatus newStatus) {
+
+        appointmentService.changeAppointmentStatus(id, newStatus);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/pending-appointments/{date}")
+    @Operation(
+            summary = "Contar citas pendientes por día",
+            description = "Devuelve el número de citas pendientes para una fecha específica proporcionada en el path."
+    )
+    public ResponseEntity<Integer> getPendingAppointments(@PathVariable LocalDate date) {
+        return ResponseEntity.ok(appointmentService.contarCitasPendientesDelDia(date));
+    }
+
+    @GetMapping("/client-availability/{clientId}")
+    @Operation(
+            summary = "Verificar si el cliente tiene una cita hoy",
+            description = "Devuelve true si el cliente ya tiene una cita pendiente o confirmada en la fecha actual, y false si está disponible para agendar."
+    )
+    public ResponseEntity<Boolean> tieneCitaHoy(@PathVariable Long clientId) {
+        return ResponseEntity.ok(appointmentService.existenCitasHoy(clientId));
     }
 
     private ResponseEntity<PageOutDto<AppointmentResponseDto>> getPageOutDtoResponseEntity(@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(required = false) LocalDate startDate, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(required = false) LocalDate endDate, @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) @RequestParam(required = false) LocalTime startHour, @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) @RequestParam(required = false) LocalTime endHour, @RequestParam(required = false) AppointmentStatus status, @RequestParam(required = false) OrderStatus orderStatus, @RequestParam(required = false) BigDecimal minOrderTotal, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, String clientEmail) {
         List<Appointment> appointments = appointmentCriteriaBuilder.findAllWithFilters(
-                startDate, endDate, startHour, endHour, status, clientEmail, orderStatus, minOrderTotal,
-                page, size
+                startDate, endDate, startHour, endHour, status, clientEmail, orderStatus, minOrderTotal, page, size
         );
 
         long totalElements = appointmentCriteriaBuilder.countWithFilters(
@@ -116,32 +159,13 @@ public class AppointmentController {
                 .toList();
 
         PageOutDto<AppointmentResponseDto> response = new PageOutDto<>(
-                page, size, totalElements, (int) Math.ceil((double) totalElements / size), content
+                page,
+                size,
+                totalElements,
+                (int) Math.ceil((double) totalElements / size),
+                content
         );
 
         return ResponseEntity.ok(response);
     }
-
-
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> updateAppointmentStatus(
-            @PathVariable Long id,
-            @RequestParam AppointmentStatus newStatus) {
-
-        appointmentService.changeAppointmentStatus(id, newStatus);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/pending-appointments/{date}")
-    public ResponseEntity<Integer> getPendingAppointments(
-            @RequestParam LocalDate date) {
-
-        return ResponseEntity.ok(appointmentService.contarCitasPendientesDelDia(date));
-    }
-
-    @GetMapping("/disponibilidad/{clientId}")
-    public ResponseEntity<Boolean> tieneCitaHoy(@PathVariable Long clientId) {
-        return ResponseEntity.ok(appointmentService.existenCitasHoy(clientId));
-    }
-
 }
