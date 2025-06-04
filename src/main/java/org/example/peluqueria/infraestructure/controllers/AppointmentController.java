@@ -139,4 +139,9 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.contarCitasPendientesDelDia(date));
     }
 
+    @GetMapping("/disponibilidad/{clientId}")
+    public ResponseEntity<Boolean> tieneCitaHoy(@PathVariable Long clientId) {
+        return ResponseEntity.ok(appointmentService.existenCitasHoy(clientId));
+    }
+
 }

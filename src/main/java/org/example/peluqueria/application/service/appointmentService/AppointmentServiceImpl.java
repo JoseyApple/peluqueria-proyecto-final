@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -113,6 +114,23 @@ public class AppointmentServiceImpl implements AppointmentService {
                 AppointmentStatus.PENDING, inicio, fin
         );
     }
+
+    @Override
+    public boolean existenCitasHoy(Long clientId) {
+        LocalDateTime inicio = LocalDate.now().atStartOfDay();
+        LocalDateTime fin = LocalDate.now().atTime(LocalTime.MAX);
+
+        List<AppointmentStatus> estadosBloqueantes = List.of(
+                AppointmentStatus.PENDING,
+                AppointmentStatus.CONFIRMED
+        );
+
+        return appointmentRepository.existsByClientIdAndStartTimeBetweenAndStatusIn(
+                clientId, inicio, fin, estadosBloqueantes
+        );
+    }
+
+
 
 
 

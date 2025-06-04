@@ -18,4 +18,6 @@ public interface AppointmentService {
     Page<Appointment> findall(Pageable pageable);
 
     int contarCitasPendientesDelDia(LocalDate fecha);
+
+    boolean existenCitasHoy(Long clientId);
 }

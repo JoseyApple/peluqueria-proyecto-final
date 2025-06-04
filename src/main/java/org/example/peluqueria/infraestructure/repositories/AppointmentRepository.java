@@ -13,13 +13,13 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
     boolean existsByStartTimeLessThanAndEndTimeGreaterThan(LocalDateTime endTime, LocalDateTime startTime);
-    Page<Appointment> getAppointmentsByClient(Long clientId, Pageable pageable);
-    Page<Appointment> findByClient(AppUser client, Pageable pageable);
+        Page<Appointment> findByClient(AppUser client, Pageable pageable);
     boolean existsByStartTimeLessThanAndEndTimeGreaterThanAndStatusNot(
             LocalDateTime endTime, LocalDateTime startTime, AppointmentStatus status);
 
@@ -30,6 +30,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     int marcarComoExpiradas(@Param("oldStatus") AppointmentStatus oldStatus,
                             @Param("newStatus") AppointmentStatus newStatus,
                             @Param("ahora") LocalDateTime ahora);
+
+    boolean existsByClientIdAndStartTimeBetweenAndStatusIn(
+            Long clientId,
+            LocalDateTime start,
+            LocalDateTime end,
+            List<AppointmentStatus> statuses
+    );
 
 
 }
