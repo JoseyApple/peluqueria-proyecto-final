@@ -47,23 +47,4 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             List<AppointmentStatus> statuses
     );
 
-    @Modifying
-    @Transactional
-    @Query("""
-    UPDATE Appointment a
-    SET a.order.status = :nuevoEstado
-    WHERE a.order.status = :estadoActual
-    AND a.status IN (:estadosCita)
-    AND a.startTime < :ahora
-""")
-    int actualizarEstadoOrdenesVinculadas(
-            @Param("estadoActual") OrderStatus estadoActual,
-            @Param("nuevoEstado") OrderStatus nuevoEstado,
-            @Param("estadosCita") List<AppointmentStatus> estadosCita,
-            @Param("ahora") LocalDateTime ahora
-    );
-
-
-
-
 }

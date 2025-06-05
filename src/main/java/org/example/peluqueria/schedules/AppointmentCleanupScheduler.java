@@ -20,7 +20,7 @@ public class AppointmentCleanupScheduler {
     private final AppointmentRepository appointmentRepository;
     private final OrderRepository orderRepository;
 
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 * * * * *")
     @Transactional
     public void marcarCitasVencidas() {
         int actualizadas = appointmentRepository.marcarComoExpiradas(
@@ -30,17 +30,17 @@ public class AppointmentCleanupScheduler {
         );
     }
 
-//    @Scheduled(cron = "0 * * * * *")
-//    @Transactional
-//    public void marcarOrdenesVencidas() {
-//        int actualizadas = appointmentRepository.actualizarEstadoOrdenesVinculadas(
-//                OrderStatus.PENDING_PAYMENT,
-//                OrderStatus.CANCELLED,
-//                List.of(AppointmentStatus.PENDING, AppointmentStatus.EXPIRED, AppointmentStatus.CANCELLED),
-//                LocalDateTime.now()
-//        );
-//
-//    }
+    @Scheduled(cron = "0 * * * * *")
+    @Transactional
+    public void marcarOrdenesVencidas() {
+        int actualizadas = orderRepository.actualizarEstadoOrdenesVinculadas(
+                OrderStatus.PENDING_PAYMENT,
+                OrderStatus.CANCELLED,
+                List.of(AppointmentStatus.PENDING, AppointmentStatus.EXPIRED, AppointmentStatus.CANCELLED),
+                LocalDateTime.now()
+        );
+    }
+
 
 
 
