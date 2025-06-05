@@ -1,7 +1,7 @@
 package org.example.peluqueria.domain;
 
 public enum OrderStatus {
-    PENDING,
+    PENDING_PAYMENT,
     PAID,
     CANCELLED
 }

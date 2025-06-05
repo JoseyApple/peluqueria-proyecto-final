@@ -7,6 +7,7 @@ import org.example.peluqueria.domain.models.AppUser;
 import org.example.peluqueria.domain.models.Appointment;
 import org.example.peluqueria.domain.models.HairdressingService;
 import org.example.peluqueria.exceptions.EntityNotFoundException;
+import org.example.peluqueria.exceptions.InvalidAppointmentStatusException;
 import org.example.peluqueria.infraestructure.repositories.AppointmentRepository;
 import org.example.peluqueria.infraestructure.repositories.HairdressingServiceRepository;
 import org.example.peluqueria.infraestructure.utils.TimeUtils;
@@ -25,7 +26,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
     private final AppUserService appUserService;
-    private final HairdressingServiceRepository hairdressingServiceRepository;
+    private static final List<String> appointmentStatuses = List.of(AppointmentStatus.PENDING.name(),
+            AppointmentStatus.CANCELLED.name(), AppointmentStatus.EXPIRED.name(),
+            AppointmentStatus.COMPLETED.name(), AppointmentStatus.CONFIRMED.name());
 
     @Override
     public Appointment createAppointment(Appointment appointment) {
@@ -34,7 +37,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (appointment.getServices() == null || appointment.getServices().isEmpty()) {
             throw new IllegalArgumentException("Debe seleccionar al menos un servicio.");
         }
-        System.out.println(appointment.getServices().size());
 
         // Calcular duración total de los servicios
         int totalDurationMinutes = appointment.getServices()
@@ -70,13 +72,19 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public void changeAppointmentStatus(Long appointmentId, AppointmentStatus newStatus) {
+    public void changeAppointmentStatus(Long appointmentId, String newStatus) {
+
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Cita no encontrada."));
 
+        if (!appointmentStatuses.contains(newStatus.toUpperCase())) {
+
+            throw new InvalidAppointmentStatusException("El estado de cita indicado no existe");
+        }
+
         AppointmentStatus currentStatus = appointment.getStatus();
 
-        if (currentStatus == newStatus) {
+        if (currentStatus.name().equalsIgnoreCase(newStatus)) {
             throw new IllegalStateException("La cita ya está en el estado solicitado.");
         }
 
@@ -85,11 +93,11 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new IllegalStateException("No se puede cambiar el estado de una cita cancelada.");
         }
 
-        if (currentStatus == AppointmentStatus.COMPLETED && newStatus != AppointmentStatus.CANCELLED) {
+        if (currentStatus == AppointmentStatus.COMPLETED && !newStatus.equalsIgnoreCase(AppointmentStatus.CANCELLED.name())) {
             throw new IllegalStateException("No se puede modificar una cita completada.");
         }
 
-        appointment.setStatus(newStatus);
+        appointment.setStatus(AppointmentStatus.valueOf(newStatus));
         appointmentRepository.save(appointment);
     }
 

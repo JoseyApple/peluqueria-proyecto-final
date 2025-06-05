@@ -2,9 +2,11 @@ package org.example.peluqueria.infraestructure.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.peluqueria.application.service.appointmentService.AppointmentService;
 import org.example.peluqueria.application.service.appuser.AppUserService;
+import org.example.peluqueria.application.service.order.OrderService;
 import org.example.peluqueria.domain.AppointmentStatus;
 import org.example.peluqueria.domain.OrderStatus;
 import org.example.peluqueria.domain.models.AppUser;
@@ -44,6 +46,7 @@ public class AppointmentController {
     private final HairdressingServiceRepository hairdressingServiceRepository;
     private final SecurityUtils securityUtils;
     private final AppointmentCriteriaBuilder appointmentCriteriaBuilder;
+    private final OrderService orderService;
 
     @PostMapping
     @Operation(
@@ -51,7 +54,7 @@ public class AppointmentController {
             description = "Permite a un cliente o un administrador crear una nueva cita con los servicios seleccionados y la hora de inicio."
     )
     public ResponseEntity<AppointmentResponseDto> createAppointment(
-            @RequestBody CreateAppointmentDto dto,
+            @Valid @RequestBody CreateAppointmentDto dto,
             @AuthenticationPrincipal UserPrincipal currentUser) {
 
 
@@ -66,6 +69,8 @@ public class AppointmentController {
         appointment.setServices(services);
 
         Appointment created = appointmentService.createAppointment(appointment);
+        orderService.createOrder(created.getId());
+
         AppointmentResponseDto response = AppointmentResponseDto.fromEntity(created);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -114,14 +119,14 @@ public class AppointmentController {
         return getPageOutDtoResponseEntity(startDate, endDate, startHour, endHour, status, orderStatus, minOrderTotal, page, size, clientEmail);
     }
 
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{id}")
     @Operation(
             summary = "Actualizar estado de una cita",
             description = "Permite modificar el estado de una cita existente (por ejemplo, cambiar a CONFIRMED o CANCELLED) mediante su ID."
     )
     public ResponseEntity<Void> updateAppointmentStatus(
             @PathVariable Long id,
-            @RequestParam AppointmentStatus newStatus) {
+            @RequestParam String newStatus) {
 
         appointmentService.changeAppointmentStatus(id, newStatus);
         return ResponseEntity.noContent().build();

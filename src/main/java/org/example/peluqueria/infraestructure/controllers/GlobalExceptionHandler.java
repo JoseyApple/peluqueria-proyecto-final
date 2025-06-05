@@ -39,7 +39,8 @@ public class GlobalExceptionHandler {
             UnprocessableEntityException.class,
             EmailNotValidException.class,
             InvalidPasswordException.class,
-            InvalidOrderStatusCondition.class
+            InvalidOrderStatusCondition.class,
+            InvalidAppointmentStatusException.class
     })
     protected ResponseEntity<ErrorOutDto> handleInvalidParameters(Exception ex) {
 

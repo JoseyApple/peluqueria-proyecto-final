@@ -1,6 +1,8 @@
 package org.example.peluqueria.infraestructure.repositories;
 
+import jakarta.transaction.Transactional;
 import org.example.peluqueria.domain.AppointmentStatus;
+import org.example.peluqueria.domain.OrderStatus;
 import org.example.peluqueria.domain.models.AppUser;
 import org.example.peluqueria.domain.models.Appointment;
 import org.springframework.data.domain.Page;
@@ -26,10 +28,17 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     int countAllByStatusAndStartTimeBetween(AppointmentStatus status, LocalDateTime start, LocalDateTime end);
 
     @Modifying
-    @Query("UPDATE Appointment a SET a.status = :newStatus WHERE a.status = :oldStatus AND a.startTime < :ahora")
-    int marcarComoExpiradas(@Param("oldStatus") AppointmentStatus oldStatus,
-                            @Param("newStatus") AppointmentStatus newStatus,
-                            @Param("ahora") LocalDateTime ahora);
+    @Query("""
+    UPDATE Appointment a
+    SET a.status = :nuevoEstado
+    WHERE a.status = :estadoActual AND a.startTime < :fechaHoraLimite
+""")
+    int marcarComoExpiradas(
+            @Param("estadoActual") AppointmentStatus estadoActual,
+            @Param("nuevoEstado") AppointmentStatus nuevoEstado,
+            @Param("fechaHoraLimite") LocalDateTime fechaHoraLimite
+    );
+
 
     boolean existsByClientIdAndStartTimeBetweenAndStatusIn(
             Long clientId,
@@ -37,6 +46,24 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             LocalDateTime end,
             List<AppointmentStatus> statuses
     );
+
+    @Modifying
+    @Transactional
+    @Query("""
+    UPDATE Appointment a
+    SET a.order.status = :nuevoEstado
+    WHERE a.order.status = :estadoActual
+    AND a.status IN (:estadosCita)
+    AND a.startTime < :ahora
+""")
+    int actualizarEstadoOrdenesVinculadas(
+            @Param("estadoActual") OrderStatus estadoActual,
+            @Param("nuevoEstado") OrderStatus nuevoEstado,
+            @Param("estadosCita") List<AppointmentStatus> estadosCita,
+            @Param("ahora") LocalDateTime ahora
+    );
+
+
 
 
 }

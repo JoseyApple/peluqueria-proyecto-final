@@ -11,7 +11,7 @@ public interface AppointmentService {
 
     Appointment createAppointment(Appointment appointment);
 
-    void changeAppointmentStatus(Long appointmentId, AppointmentStatus newStatus);
+    void changeAppointmentStatus(Long appointmentId, String newStatus);
 
     Page<Appointment> getAppointmentsByClient(Long clientId, Pageable pageable);
 

@@ -31,7 +31,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Cita no encontrada."));
 
         if (appointment.getOrder() != null) {
-            throw new IllegalStateException("Ya existe un pago para esta cita.");
+            throw new IllegalStateException("Ya existe una factura para esta cita.");
         }
 
         BigDecimal totalAmount = appointment.getServices()
@@ -43,11 +43,11 @@ public class OrderServiceImpl implements OrderService {
         order.setCreatedAt(LocalDateTime.now());
         order.setClient(appointment.getClient());
         order.setTotalAmount(totalAmount);
-        order.setStatus(OrderStatus.PENDING);
+        order.setStatus(OrderStatus.PENDING_PAYMENT);
+        order.setAppointment(appointment);
 
         Order savedOrder = orderRepository.save(order);
 
-        // Asociar el Order a la cita
         appointment.setOrder(savedOrder);
         appointmentRepository.save(appointment);
 

@@ -23,13 +23,6 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping("/appointment/{appointmentId}")
-    public ResponseEntity<OrderResponseDto> createOrder(@PathVariable Long appointmentId) {
-        Order order = orderService.createOrder(appointmentId);
-        OrderResponseDto response = OrderResponseDto.fromEntity(order);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @PatchMapping("/orders/{id}/status")
     public ResponseEntity<Void> updateOrderStatus(
             @PathVariable Long id,
