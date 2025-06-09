@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface HairdressingServiceRepository extends JpaRepository<HairdressingService, Long> {
+
+    HairdressingService findByName(String name);
 }

@@ -53,7 +53,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = {
-            EmailAlreadyExistsException.class
+            EmailAlreadyExistsException.class,
+            EntityExistsException.class
     })
     protected ResponseEntity<ErrorOutDto> handleEmailAlreadyExistsException(Exception ex) {
 
