@@ -8,12 +8,15 @@ import org.example.peluqueria.domain.OrderStatus;
 import org.example.peluqueria.domain.models.Order;
 import org.example.peluqueria.infraestructure.dto.PageOutDto;
 import org.example.peluqueria.infraestructure.dto.order.OrderResponseDto;
+import org.example.peluqueria.infraestructure.security.UserPrincipal;
+import org.example.peluqueria.infraestructure.utils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +28,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final SecurityUtils securityUtils;
 
     @PatchMapping("/{id}")
     @Operation(
@@ -73,9 +77,24 @@ public class OrderController {
             summary = "Obtener factura específica por cliente",
             description = "Permite obtener una orden concreta asociada a un cliente, validando que pertenezca a dicho cliente."
     )
-    public ResponseEntity<OrderResponseDto> getOrder(@PathVariable Long clientId, @PathVariable Long idOrder) {
+    public ResponseEntity<OrderResponseDto> getOrder(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long clientId,
+            @PathVariable Long idOrder) {
 
-        return ResponseEntity.ok(OrderResponseDto.fromEntity(orderService.getOrderByAppIdAndOrderId(clientId, idOrder)));
+        if (!clientId.equals(principal.getId())) {
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Order order = orderService.findById(idOrder);
+
+        if (!order.getClient().getId().equals(principal.getId())) {
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(OrderResponseDto.fromEntity(orderService.getOrderByAppIdAndOrderId(clientId, order.getId())));
     }
 
     @GetMapping

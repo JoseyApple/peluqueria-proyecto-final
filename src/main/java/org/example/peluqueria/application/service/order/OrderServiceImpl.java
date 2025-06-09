@@ -98,5 +98,11 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.findAll(pageable);
     }
+
+    @Override
+    public Order findById(Long id) {
+
+        return orderRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + id));
+    }
 }
 

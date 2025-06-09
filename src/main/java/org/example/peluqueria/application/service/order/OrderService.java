@@ -17,4 +17,6 @@ public interface OrderService {
     Order getOrderByAppIdAndOrderId(Long appId, Long orderId);
 
     Page<Order> findAllorders(Pageable pageable);
+
+    Order findById(Long id);
 }
