@@ -3,6 +3,7 @@ package org.example.peluqueria.infraestructure.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.peluqueria.application.service.hairdressing.HairDressingServiceInterface;
 import org.example.peluqueria.domain.models.HairdressingService;
@@ -61,7 +62,7 @@ public class HairdressingServiceController {
             description = "Permite registrar un nuevo servicio de peluquería si no existe uno con el mismo nombre."
     )
     @PostMapping
-    public ResponseEntity<HairdressingServiceResponseDto> createService(@RequestBody HairDressingServiceCreateDto dto) {
+    public ResponseEntity<HairdressingServiceResponseDto> createService(@Valid @RequestBody HairDressingServiceCreateDto dto) {
         HairdressingService service = dto.toEntity();
         HairdressingService saved = hairdressingService.save(service);
         return new ResponseEntity<>(HairdressingServiceResponseDto.fromEntity(saved), HttpStatus.CREATED);

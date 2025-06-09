@@ -19,10 +19,6 @@ import org.example.peluqueria.infraestructure.dto.appointment.CreateAppointmentD
 import org.example.peluqueria.infraestructure.repositories.HairdressingServiceRepository;
 import org.example.peluqueria.infraestructure.security.UserPrincipal;
 import org.example.peluqueria.infraestructure.utils.SecurityUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
