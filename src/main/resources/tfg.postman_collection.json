@@ -1,0 +1,244 @@
+{
+	"info": {
+		"_postman_id": "60435cea-2248-4c7d-881b-08585a0cd128",
+		"name": "tfg",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43292168"
+	},
+	"item": [
+		{
+			"name": "cita",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc0OTQ2MDIxMSwiZXhwIjoxNzQ5NDYzODExLCJ1c2VySWQiOjEsImF1dGhvcml0aWVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dfQ.COSKZUDxhPq7vnoRZAkT19bvbtpvG76sCcwv0K5Kqr-EEo4VBrFDM-60o49tgccm",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"startTime\": \"2025-06-09T17:00:00\",\r\n  \"clientId\": 1,\r\n  \"serviceIds\": [1]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/appointments",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"appointments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "obtenercitas",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc0OTQ1NTA1MywiZXhwIjoxNzQ5NDU4NjUzLCJ1c2VySWQiOjEsImF1dGhvcml0aWVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dfQ.DZIQpqkf5uJPCVYNUtOhzp5R6yUU3c8uKPvf9SiL52sYJZFb3alqFM2221KD7OOh",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"startTime\": \"2025-06-05T17:00:00\",\r\n  \"clientId\": 1,\r\n  \"serviceIds\": [1]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/appointments/search",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"appointments",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "estado cita",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc0OTQ1NTA1MywiZXhwIjoxNzQ5NDU4NjUzLCJ1c2VySWQiOjEsImF1dGhvcml0aWVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dfQ.DZIQpqkf5uJPCVYNUtOhzp5R6yUU3c8uKPvf9SiL52sYJZFb3alqFM2221KD7OOh",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"startTime\": \"2025-06-05T13:19:00\",\r\n  \"clientId\": 1,\r\n  \"serviceIds\": [1]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/appointments/1?newStatus=CONFIRMED",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"appointments",
+						"1"
+					],
+					"query": [
+						{
+							"key": "newStatus",
+							"value": "CONFIRMED"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "factura estado",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc0OTEyMDk3NywiZXhwIjoxNzQ5MTI0NTc3LCJ1c2VySWQiOjEsImF1dGhvcml0aWVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dfQ.LqKTnh5Wel3Jlhu_il-SppIzcJW7vG22Rd0ls9OlTY9RT5vtqFJX07fg6hNuKjNp",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"startTime\": \"2025-06-05T13:19:00\",\r\n  \"clientId\": 1,\r\n  \"serviceIds\": [1]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/orders/1?newStatus=PAID",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"orders",
+						"1"
+					],
+					"query": [
+						{
+							"key": "newStatus",
+							"value": "PAID"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"admin@example.com\",\r\n    \"password\":\"Josemanuelgmod1997\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/auth/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "services",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc0OTQ2MDIxMSwiZXhwIjoxNzQ5NDYzODExLCJ1c2VySWQiOjEsImF1dGhvcml0aWVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dfQ.COSKZUDxhPq7vnoRZAkT19bvbtpvG76sCcwv0K5Kqr-EEo4VBrFDM-60o49tgccm",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/services",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"services"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
