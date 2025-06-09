@@ -54,7 +54,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc0OTQ1NTA1MywiZXhwIjoxNzQ5NDU4NjUzLCJ1c2VySWQiOjEsImF1dGhvcml0aWVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dfQ.DZIQpqkf5uJPCVYNUtOhzp5R6yUU3c8uKPvf9SiL52sYJZFb3alqFM2221KD7OOh",
+							"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc0OTQ2MDIxMSwiZXhwIjoxNzQ5NDYzODExLCJ1c2VySWQiOjEsImF1dGhvcml0aWVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dfQ.COSKZUDxhPq7vnoRZAkT19bvbtpvG76sCcwv0K5Kqr-EEo4VBrFDM-60o49tgccm",
 							"type": "string"
 						}
 					]
@@ -195,6 +195,43 @@
 					"path": [
 						"auth",
 						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "servicio",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc0OTQ2MjgwNiwiZXhwIjoxNzQ5NDY2NDA2LCJ1c2VySWQiOjEsImF1dGhvcml0aWVzIjpbeyJhdXRob3JpdHkiOiJST0xFX0FETUlOIn1dfQ.7S_zdLOQVK9pODRynNuwF-GeBHirFbpL5Y_rq6PGA-C17EiYp_JTOSzAGZmQCL9h",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"description\": \"Corte clásico para hombres y mujeres\",\r\n  \"durationMinutes\": 0,\r\n  \"price\": -100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/services",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"services"
 					]
 				}
 			},
