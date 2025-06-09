@@ -10,7 +10,7 @@ public interface OrderService {
 
     Order createOrder(Long appointmentId);
 
-    void changeOrderStatus(Long orderId, OrderStatus newStatus);
+    void changeOrderStatus(Long orderId, String newStatus);
 
     Page<Order> getOrdersByClient(Long clientId, Pageable pageable);
 

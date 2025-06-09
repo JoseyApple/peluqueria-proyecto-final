@@ -8,6 +8,7 @@ import org.example.peluqueria.domain.models.Appointment;
 import org.example.peluqueria.domain.models.HairdressingService;
 import org.example.peluqueria.domain.models.Order;
 import org.example.peluqueria.exceptions.EntityNotFoundException;
+import org.example.peluqueria.exceptions.InvalidOrderStatusCondition;
 import org.example.peluqueria.infraestructure.repositories.AppointmentRepository;
 import org.example.peluqueria.infraestructure.repositories.OrderRepository;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final AppointmentRepository appointmentRepository;
     private final AppUserService appUserService;
+    private final static List<String> ordersStatus = List.of(OrderStatus.PENDING_PAYMENT.name(),OrderStatus.CANCELLED.name(),OrderStatus.PAID.name());
 
     @Override
     public Order createOrder(Long appointmentId) {
@@ -55,17 +58,23 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void changeOrderStatus(Long orderId, OrderStatus newStatus) {
+    public void changeOrderStatus(Long orderId, String newStatus) {
+
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("Orden no encontrada."));
+                .orElseThrow(() -> new EntityNotFoundException("Factura no encontrada."));
 
-        OrderStatus currentStatus = order.getStatus();
+        if (!ordersStatus.contains(newStatus.toUpperCase())) {
 
-        if (currentStatus == newStatus) {
-            throw new IllegalStateException("La orden ya está en el estado solicitado.");
+            throw new InvalidOrderStatusCondition("El estado no es correcto.");
         }
 
-        order.setStatus(newStatus);
+        if (order.getStatus().name().equalsIgnoreCase(newStatus)) {
+
+            throw new InvalidOrderStatusCondition("La factura ya esta: " + newStatus.toUpperCase());
+        }
+
+        order.setStatus(OrderStatus.valueOf(newStatus.toUpperCase()));
+
         orderRepository.save(order);
     }
 
