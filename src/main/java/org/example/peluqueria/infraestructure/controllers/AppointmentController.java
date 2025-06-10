@@ -15,7 +15,9 @@ import org.example.peluqueria.domain.models.HairdressingService;
 import org.example.peluqueria.infraestructure.criteriabuilders.AppointmentCriteriaBuilder;
 import org.example.peluqueria.infraestructure.dto.PageOutDto;
 import org.example.peluqueria.infraestructure.dto.appointment.AppointmentResponseDto;
+import org.example.peluqueria.infraestructure.dto.appointment.AppointmentResponseDto2;
 import org.example.peluqueria.infraestructure.dto.appointment.CreateAppointmentDto;
+import org.example.peluqueria.infraestructure.repositories.AppointmentRepository;
 import org.example.peluqueria.infraestructure.repositories.HairdressingServiceRepository;
 import org.example.peluqueria.infraestructure.security.UserPrincipal;
 import org.example.peluqueria.infraestructure.utils.SecurityUtils;
@@ -30,6 +32,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -44,6 +47,7 @@ public class AppointmentController {
     private final SecurityUtils securityUtils;
     private final AppointmentCriteriaBuilder appointmentCriteriaBuilder;
     private final OrderService orderService;
+    private final AppointmentRepository appointmentRepository;
 
     @PostMapping
     @Operation(
@@ -174,5 +178,20 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.existenCitasHoy(clientId));
     }
 
+    @GetMapping("/times-availability")
+    @Operation(
+            summary = "Lista de reservas para fecha",
+            description = "Devuelve una lista simplificada de reservas."
+    )
+    public ResponseEntity<List<AppointmentResponseDto2>> listarReservas(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date
+    ) {
+        List<Appointment> appointments = appointmentRepository.findAllByStartTime(date);
+        List<AppointmentResponseDto2> response = appointments.stream()
+                .map(AppointmentResponseDto2::fromEntity)
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
 
 }

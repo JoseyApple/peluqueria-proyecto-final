@@ -20,7 +20,6 @@ import java.util.List;
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-    boolean existsByStartTimeLessThanAndEndTimeGreaterThan(LocalDateTime endTime, LocalDateTime startTime);
         Page<Appointment> findByClient(AppUser client, Pageable pageable);
     boolean existsByStartTimeLessThanAndEndTimeGreaterThanAndStatusNot(
             LocalDateTime endTime, LocalDateTime startTime, AppointmentStatus status);
@@ -46,5 +45,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             LocalDateTime end,
             List<AppointmentStatus> statuses
     );
+
+    List<Appointment> findAllByStartTime(LocalDateTime start);
 
 }
