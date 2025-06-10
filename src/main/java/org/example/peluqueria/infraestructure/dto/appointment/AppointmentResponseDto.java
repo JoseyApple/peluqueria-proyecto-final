@@ -9,6 +9,7 @@ import java.util.List;
 
 public record AppointmentResponseDto(
         Long id,
+        Long clientId,
         LocalDateTime startTime,
         LocalDateTime endTime,
         List<String> services,
@@ -23,6 +24,7 @@ public record AppointmentResponseDto(
 
         return new AppointmentResponseDto(
                 appointment.getId(),
+                appointment.getClient().getId(),
                 appointment.getStartTime(),
                 appointment.getEndTime(),
                 serviceNames,

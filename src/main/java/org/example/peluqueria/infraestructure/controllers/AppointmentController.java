@@ -174,4 +174,5 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.existenCitasHoy(clientId));
     }
 
+
 }
