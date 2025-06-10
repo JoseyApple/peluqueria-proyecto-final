@@ -2,7 +2,6 @@ package org.example.peluqueria.schedules;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.apache.juli.logging.Log;
 import org.example.peluqueria.domain.AppointmentStatus;
 import org.example.peluqueria.infraestructure.repositories.AppointmentRepository;
 import org.example.peluqueria.infraestructure.repositories.OrderRepository;
@@ -40,10 +39,6 @@ public class AppointmentCleanupScheduler {
                 LocalDateTime.now()
         );
     }
-
-
-
-
 
 }
 

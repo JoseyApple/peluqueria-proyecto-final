@@ -11,8 +11,7 @@ import org.example.peluqueria.domain.models.Appointment;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +22,8 @@ public class AppointmentCriteriaBuilder {
     private final EntityManager em;
 
     public List<Appointment> findAllWithFilters(
-            LocalDate startDate,
-            LocalDate endDate,
-            LocalTime startHour,
-            LocalTime endHour,
+            LocalDateTime startDateTime,
+            LocalDateTime endDateTime,
             AppointmentStatus status,
             String clientEmail,
             OrderStatus orderStatus,
@@ -42,7 +39,7 @@ public class AppointmentCriteriaBuilder {
         Join<Appointment, Order> orderJoin = root.join("order", JoinType.LEFT);
 
         List<Predicate> predicates = buildPredicates(cb, root, clientJoin, orderJoin,
-                startDate, endDate, startHour, endHour, status, clientEmail, orderStatus, minOrderTotal);
+                startDateTime, endDateTime, status, clientEmail, orderStatus, minOrderTotal);
 
         cq.where(predicates.toArray(new Predicate[0]));
 
@@ -54,10 +51,8 @@ public class AppointmentCriteriaBuilder {
     }
 
     public long countWithFilters(
-            LocalDate startDate,
-            LocalDate endDate,
-            LocalTime startHour,
-            LocalTime endHour,
+            LocalDateTime startDateTime,
+            LocalDateTime endDateTime,
             AppointmentStatus status,
             String clientEmail,
             OrderStatus orderStatus,
@@ -71,7 +66,7 @@ public class AppointmentCriteriaBuilder {
         Join<Appointment, Order> orderJoin = root.join("order", JoinType.LEFT);
 
         List<Predicate> predicates = buildPredicates(cb, root, clientJoin, orderJoin,
-                startDate, endDate, startHour, endHour, status, clientEmail, orderStatus, minOrderTotal);
+                startDateTime, endDateTime, status, clientEmail, orderStatus, minOrderTotal);
 
         countQuery.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
 
@@ -83,10 +78,8 @@ public class AppointmentCriteriaBuilder {
             Root<Appointment> root,
             Join<Appointment, AppUser> clientJoin,
             Join<Appointment, Order> orderJoin,
-            LocalDate startDate,
-            LocalDate endDate,
-            LocalTime startHour,
-            LocalTime endHour,
+            LocalDateTime startDateTime,
+            LocalDateTime endDateTime,
             AppointmentStatus status,
             String clientEmail,
             OrderStatus orderStatus,
@@ -94,17 +87,11 @@ public class AppointmentCriteriaBuilder {
     ) {
         List<Predicate> predicates = new ArrayList<>();
 
-        if (startDate != null) {
-            predicates.add(cb.greaterThanOrEqualTo(orderJoin.get("createdAt"), startDate.atStartOfDay()));
+        if (startDateTime != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("startTime"), startDateTime));
         }
-        if (endDate != null) {
-            predicates.add(cb.lessThanOrEqualTo(orderJoin.get("createdAt"), endDate.atTime(LocalTime.MAX)));
-        }
-        if (startHour != null) {
-            predicates.add(cb.greaterThanOrEqualTo(cb.function("TIME", LocalTime.class, root.get("startTime")), startHour));
-        }
-        if (endHour != null) {
-            predicates.add(cb.lessThanOrEqualTo(cb.function("TIME", LocalTime.class, root.get("endTime")), endHour));
+        if (endDateTime != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("endTime"), endDateTime));
         }
         if (status != null) {
             predicates.add(cb.equal(root.get("status"), status));
@@ -122,4 +109,5 @@ public class AppointmentCriteriaBuilder {
         return predicates;
     }
 }
+
 

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -79,20 +80,39 @@ public class AppointmentController {
             summary = "Buscar citas (ADMIN)",
             description = "Permite a un administrador buscar citas filtrando por fecha, hora, estado, correo del cliente, estado del pedido y monto mínimo del pedido, con paginación."
     )
-    public ResponseEntity<PageOutDto<AppointmentResponseDto>> searchAppointments(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startHour,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endHour,
+    public ResponseEntity<PageOutDto<AppointmentResponseDto>> getPageOutDtoResponseEntity(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
             @RequestParam(required = false) AppointmentStatus status,
-            @RequestParam(required = false) String clientEmail,
             @RequestParam(required = false) OrderStatus orderStatus,
             @RequestParam(required = false) BigDecimal minOrderTotal,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String clientEmail
     ) {
-        return getPageOutDtoResponseEntity(startDate, endDate, startHour, endHour, status, orderStatus, minOrderTotal, page, size, clientEmail);
+        List<Appointment> appointments = appointmentCriteriaBuilder.findAllWithFilters(
+                startDateTime, endDateTime, status, clientEmail, orderStatus, minOrderTotal, page, size
+        );
+
+        long totalElements = appointmentCriteriaBuilder.countWithFilters(
+                startDateTime, endDateTime, status, clientEmail, orderStatus, minOrderTotal
+        );
+
+        List<AppointmentResponseDto> content = appointments.stream()
+                .map(AppointmentResponseDto::fromEntity)
+                .toList();
+
+        PageOutDto<AppointmentResponseDto> response = new PageOutDto<>(
+                page,
+                size,
+                totalElements,
+                (int) Math.ceil((double) totalElements / size),
+                content
+        );
+
+        return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/my-appointments/search")
     @Operation(
@@ -100,10 +120,8 @@ public class AppointmentController {
             description = "Permite a un usuario autenticado buscar sus propias citas con filtros por fecha, hora, estado, pedido y total mínimo, incluyendo paginación."
     )
     public ResponseEntity<PageOutDto<AppointmentResponseDto>> searchMyAppointments(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startHour,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endHour,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
             @RequestParam(required = false) AppointmentStatus status,
             @RequestParam(required = false) OrderStatus orderStatus,
             @RequestParam(required = false) BigDecimal minOrderTotal,
@@ -112,7 +130,17 @@ public class AppointmentController {
             @AuthenticationPrincipal UserPrincipal user
     ) {
         String clientEmail = user.getUsername();
-        return getPageOutDtoResponseEntity(startDate, endDate, startHour, endHour, status, orderStatus, minOrderTotal, page, size, clientEmail);
+
+        return getPageOutDtoResponseEntity(
+                startDateTime,
+                endDateTime,
+                status,
+                orderStatus,
+                minOrderTotal,
+                page,
+                size,
+                clientEmail
+        );
     }
 
     @PatchMapping("/{id}")
@@ -146,27 +174,4 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.existenCitasHoy(clientId));
     }
 
-    private ResponseEntity<PageOutDto<AppointmentResponseDto>> getPageOutDtoResponseEntity(@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(required = false) LocalDate startDate, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(required = false) LocalDate endDate, @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) @RequestParam(required = false) LocalTime startHour, @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) @RequestParam(required = false) LocalTime endHour, @RequestParam(required = false) AppointmentStatus status, @RequestParam(required = false) OrderStatus orderStatus, @RequestParam(required = false) BigDecimal minOrderTotal, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, String clientEmail) {
-        List<Appointment> appointments = appointmentCriteriaBuilder.findAllWithFilters(
-                startDate, endDate, startHour, endHour, status, clientEmail, orderStatus, minOrderTotal, page, size
-        );
-
-        long totalElements = appointmentCriteriaBuilder.countWithFilters(
-                startDate, endDate, startHour, endHour, status, clientEmail, orderStatus, minOrderTotal
-        );
-
-        List<AppointmentResponseDto> content = appointments.stream()
-                .map(AppointmentResponseDto::fromEntity)
-                .toList();
-
-        PageOutDto<AppointmentResponseDto> response = new PageOutDto<>(
-                page,
-                size,
-                totalElements,
-                (int) Math.ceil((double) totalElements / size),
-                content
-        );
-
-        return ResponseEntity.ok(response);
-    }
 }
