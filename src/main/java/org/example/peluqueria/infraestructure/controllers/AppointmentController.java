@@ -179,19 +179,18 @@ public class AppointmentController {
     }
 
     @GetMapping("/times-availability")
-    @Operation(
-            summary = "Lista de reservas para fecha",
-            description = "Devuelve una lista simplificada de reservas."
-    )
-    public ResponseEntity<List<AppointmentResponseDto2>> listarReservas(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date
+    public ResponseEntity<List<AppointmentResponseDto2>> listarReservasPorDia(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        List<Appointment> appointments = appointmentRepository.findAllByStartTime(date);
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+        List<Appointment> appointments = appointmentRepository.findAllByStartTimeBetween(startOfDay, endOfDay);
+
         List<AppointmentResponseDto2> response = appointments.stream()
                 .map(AppointmentResponseDto2::fromEntity)
                 .toList();
 
         return ResponseEntity.ok(response);
     }
-
 }

@@ -46,6 +46,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             List<AppointmentStatus> statuses
     );
 
-    List<Appointment> findAllByStartTime(LocalDateTime start);
+    List<Appointment> findAllByStartTimeBetween(LocalDateTime start, LocalDateTime end);
 
 }
