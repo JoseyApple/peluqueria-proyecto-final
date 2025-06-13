@@ -21,4 +21,5 @@ public class HairdressingService {
     private String description;
     private Integer durationMinutes;
     private BigDecimal price;
+
 }

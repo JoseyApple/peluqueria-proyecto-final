@@ -33,22 +33,17 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Appointment createAppointment(Appointment appointment) {
         LocalDateTime startDateTime = appointment.getStartTime();
+        LocalDateTime endDateTime = appointment.getEndTime(); // ← usar el que viene del controller
 
         if (appointment.getServices() == null || appointment.getServices().isEmpty()) {
             throw new IllegalArgumentException("Debe seleccionar al menos un servicio.");
         }
 
-        // Calcular duración total de los servicios
-        int totalDurationMinutes = appointment.getServices()
-                .stream()
-                .mapToInt(HairdressingService::getDurationMinutes)
-                .sum();
+        if (startDateTime == null || endDateTime == null) {
+            throw new IllegalArgumentException("startTime y endTime no pueden ser nulos.");
+        }
 
-        // Calcular hora de finalización
-        LocalDateTime endDateTime = startDateTime.plusMinutes(totalDurationMinutes);
-        appointment.setEndTime(endDateTime);
-
-        // Validar que la cita esté dentro del horario permitido (mañana/tarde)
+        // Validar que esté dentro del horario
         LocalTime startTime = startDateTime.toLocalTime();
         LocalTime endTime = endDateTime.toLocalTime();
 
@@ -56,7 +51,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new IllegalArgumentException("La cita está fuera del horario de apertura.");
         }
 
-        // Validar conflictos con otras citas existentes (ignorando las canceladas)
+        // Validar conflictos
         boolean conflict = appointmentRepository.existsByStartTimeLessThanAndEndTimeGreaterThanAndStatusNot(
                 endDateTime, startDateTime, AppointmentStatus.CANCELLED);
 
@@ -64,10 +59,9 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new IllegalArgumentException("Conflicto de horarios. Ya existe una cita en ese rango.");
         }
 
-        // Establecer estado inicial
         appointment.setStatus(AppointmentStatus.PENDING);
 
-        // Guardar la cita en base de datos
+        // ✅ ¡No vuelvas a tocar el endTime!
         return appointmentRepository.save(appointment);
     }
 

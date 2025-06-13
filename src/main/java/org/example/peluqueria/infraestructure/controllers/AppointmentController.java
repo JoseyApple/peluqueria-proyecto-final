@@ -58,7 +58,7 @@ public class AppointmentController {
             @Valid @RequestBody CreateAppointmentDto dto,
             @AuthenticationPrincipal UserPrincipal currentUser) {
 
-
+        // 🔐 Validar que el usuario autenticado sea el cliente o un admin
         securityUtils.assertSameUserOrAdmin(currentUser, dto.clientId());
 
         AppUser client = appUserService.findById(dto.clientId());
@@ -69,6 +69,22 @@ public class AppointmentController {
         appointment.setClient(client);
         appointment.setServices(services);
 
+        // 🟣 DEBUG LOG
+        System.out.println("🟣 END TIME recibido: " + dto.endTime());
+        System.out.println("📅 StartTime: " + dto.startTime());
+        System.out.println("📦 Duraciones desde BD: " + services.stream().map(HairdressingService::getDurationMinutes).toList());
+
+        // ✅ Usar endTime del frontend si lo envía, si no calcularlo con los servicios
+        if (dto.endTime() != null) {
+            appointment.setEndTime(dto.endTime());
+        } else {
+            int totalDuration = services.stream()
+                    .mapToInt(HairdressingService::getDurationMinutes)
+                    .sum();
+            appointment.setEndTime(dto.startTime().plusMinutes(totalDuration));
+        }
+
+
         Appointment created = appointmentService.createAppointment(appointment);
         orderService.createOrder(created.getId());
 
@@ -76,7 +92,6 @@ public class AppointmentController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('ADMIN')")

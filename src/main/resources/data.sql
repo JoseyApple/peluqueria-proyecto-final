@@ -14,13 +14,15 @@ VALUES
      CURRENT_DATE, TRUE, 'USER');
 
 -- Servicios de Peluquería
+-- Servicios de Peluquería
 INSERT INTO hairdressing_service (name, description, duration_minutes, price) VALUES
-('Corte de Cabello', 'Corte personalizado según el estilo del cliente', 25, 15.00),
-('Coloración', 'Aplicación de tintes o mechas para cambiar el color del cabello', 120, 45.00),
-('Peinados', 'Peinados para ocasiones especiales o uso diario', 30, 20.00),
-('Tratamientos Capilares', 'Tratamientos nutritivos y reparadores para el cabello', 60, 35.00),
-('Barbería', 'Servicios de afeitado, arreglo de barba y corte masculino', 30, 18.00),
-('Tratamiento Facial', 'Limpieza profunda y revitalización del rostro', 30, 30.00);
+('Corte de Cabello', 'Corte técnico personalizado adaptado a las facciones y preferencias del cliente.', 30, 15.00),
+('Coloración', 'Servicio completo de coloración con tintes profesionales o técnicas de mechas avanzadas.', 120, 60.00),
+('Peinados', 'Diseño de peinados para eventos especiales, sesiones fotográficas o uso cotidiano.', 90, 50.00),
+('Tratamientos Capilares', 'Aplicación de tratamientos intensivos para fortalecer, nutrir y revitalizar el cabello.', 60, 35.00),
+('Barbería', 'Corte masculino de precisión, perfilado de barba y afeitado clásico.', 60, 18.00),
+('Tratamiento Facial', 'Higiene facial profunda con limpieza, exfoliación y técnicas revitalizantes.', 90, 30.00);
+
 
 -- (Opcional) Otro usuario para pruebas múltiples
 INSERT INTO users (user_name, email, password, created_at, active, role)
