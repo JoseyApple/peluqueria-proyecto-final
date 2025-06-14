@@ -11,6 +11,7 @@ import org.example.peluqueria.domain.AppointmentStatus;
 import org.example.peluqueria.domain.OrderStatus;
 import org.example.peluqueria.domain.models.AppUser;
 import org.example.peluqueria.domain.models.Appointment;
+import org.example.peluqueria.domain.models.AppointmentServiceDetail;
 import org.example.peluqueria.domain.models.HairdressingService;
 import org.example.peluqueria.infraestructure.criteriabuilders.AppointmentCriteriaBuilder;
 import org.example.peluqueria.infraestructure.dto.PageOutDto;
@@ -18,6 +19,7 @@ import org.example.peluqueria.infraestructure.dto.appointment.AppointmentRespons
 import org.example.peluqueria.infraestructure.dto.appointment.AppointmentResponseDto2;
 import org.example.peluqueria.infraestructure.dto.appointment.CreateAppointmentDto;
 import org.example.peluqueria.infraestructure.repositories.AppointmentRepository;
+import org.example.peluqueria.infraestructure.repositories.AppointmentServiceDetailRepository;
 import org.example.peluqueria.infraestructure.repositories.HairdressingServiceRepository;
 import org.example.peluqueria.infraestructure.security.UserPrincipal;
 import org.example.peluqueria.infraestructure.utils.SecurityUtils;
@@ -48,11 +50,12 @@ public class AppointmentController {
     private final AppointmentCriteriaBuilder appointmentCriteriaBuilder;
     private final OrderService orderService;
     private final AppointmentRepository appointmentRepository;
+    private final AppointmentServiceDetailRepository appointmentServiceDetailRepository;
 
     @PostMapping
     @Operation(
             summary = "Crear una cita",
-            description = "Permite a un cliente o un administrador crear una nueva cita con los servicios seleccionados y la hora de inicio."
+            description = "Permite a un cliente o un administrador crear una nueva cita con subservicios personalizados."
     )
     public ResponseEntity<AppointmentResponseDto> createAppointment(
             @Valid @RequestBody CreateAppointmentDto dto,
@@ -62,40 +65,48 @@ public class AppointmentController {
         securityUtils.assertSameUserOrAdmin(currentUser, dto.clientId());
 
         AppUser client = appUserService.findById(dto.clientId());
-        List<HairdressingService> services = hairdressingServiceRepository.findAllById(dto.serviceIds());
-
-        if (services == null || services.isEmpty()) {
-            throw new IllegalArgumentException("Debe seleccionar al menos un servicio válido.");
-        }
 
         Appointment appointment = new Appointment();
         appointment.setStartTime(dto.startTime());
         appointment.setClient(client);
-        appointment.setServices(services);
 
-        // 🟣 DEBUG LOG
-        System.out.println("🟣 END TIME recibido: " + dto.endTime());
-        System.out.println("📅 StartTime: " + dto.startTime());
-        System.out.println("📦 Duraciones desde BD: " + services.stream().map(HairdressingService::getDurationMinutes).toList());
-
-        // ✅ Usar endTime del frontend si lo envía, si no calcularlo con los servicios
+        // ⏱️ Calcular duración total si no se envió `endTime`
         if (dto.endTime() != null) {
             appointment.setEndTime(dto.endTime());
         } else {
-            int totalDuration = services.stream()
-                    .mapToInt(HairdressingService::getDurationMinutes)
+            int total = dto.subServicios().stream()
+                    .mapToInt(sub -> sub.duracionMinutos() != null ? sub.duracionMinutos() : 0)
                     .sum();
-            appointment.setEndTime(dto.startTime().plusMinutes(totalDuration));
+            appointment.setEndTime(dto.startTime().plusMinutes(total));
         }
 
-
+        // 💾 Guardar cita sin servicios tradicionales
         Appointment created = appointmentService.createAppointment(appointment);
+
+        // 💡 Guardar subservicios personalizados
+        List<AppointmentServiceDetail> detalles = dto.subServicios().stream().map(sub -> {
+            AppointmentServiceDetail d = new AppointmentServiceDetail();
+            d.setNombre(sub.nombre());
+            d.setDuracionMinutos(sub.duracionMinutos());
+            d.setPrecio(sub.precio());
+            d.setAppointment(created);
+            if (sub.servicioBaseId() != null) {
+                hairdressingServiceRepository.findById(sub.servicioBaseId())
+                        .ifPresent(d::setServicioBase);
+            }
+            return d;
+        }).toList();
+
+        appointmentServiceDetailRepository.saveAll(detalles);
+
+        // 🧾 Crear pedido
         orderService.createOrder(created.getId());
 
+        // 📤 Devolver respuesta
         AppointmentResponseDto response = AppointmentResponseDto.fromEntity(created);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('ADMIN')")

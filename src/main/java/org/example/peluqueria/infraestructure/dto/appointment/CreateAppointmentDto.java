@@ -13,5 +13,7 @@ public record CreateAppointmentDto(
         List<Long> serviceIds,
 
         @Nullable  // ✅ Este campo será opcional
-        LocalDateTime endTime
+        LocalDateTime endTime,
+
+        List<SubServicioDto> subServicios
 ) { }
