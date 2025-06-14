@@ -14,7 +14,6 @@ VALUES
      CURRENT_DATE, TRUE, 'USER');
 
 -- Servicios de Peluquería
--- Servicios de Peluquería
 INSERT INTO hairdressing_service (name, description, duration_minutes, price) VALUES
 ('Corte de Cabello', 'Corte técnico personalizado adaptado a las facciones y preferencias del cliente.', 30, 15.00),
 ('Coloración', 'Servicio completo de coloración con tintes profesionales o técnicas de mechas avanzadas.', 120, 60.00),

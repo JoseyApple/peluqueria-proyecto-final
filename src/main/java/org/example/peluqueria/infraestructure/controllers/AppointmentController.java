@@ -60,7 +60,6 @@ public class AppointmentController {
             @Valid @RequestBody CreateAppointmentDto dto,
             @AuthenticationPrincipal UserPrincipal currentUser) {
 
-        // 🔐 Validar que el usuario autenticado sea el cliente o un admin
         securityUtils.assertSameUserOrAdmin(currentUser, dto.clientId());
 
         AppUser client = appUserService.findById(dto.clientId());
@@ -68,10 +67,9 @@ public class AppointmentController {
         Appointment appointment = new Appointment();
         appointment.setStartTime(dto.startTime());
         appointment.setClient(client);
-        appointment.setServices(new ArrayList<>());
+        appointment.setServices(new ArrayList<>()); // sin servicios clásicos
 
-
-        // ⏱️ Calcular duración total si no se envió `endTime`
+        // Calcular endTime si no se pasó explícitamente
         if (dto.endTime() != null) {
             appointment.setEndTime(dto.endTime());
         } else {
@@ -81,11 +79,7 @@ public class AppointmentController {
             appointment.setEndTime(dto.startTime().plusMinutes(total));
         }
 
-        // 💾 Guardar cita sin servicios tradicionales
-        Appointment created = appointmentService.createAppointment(appointment);
-
-        // 💡 Guardar subservicios personalizados
-// 💡 Guardar subservicios personalizados
+        // Preparar subservicios
         List<AppointmentServiceDetail> detalles = dto.subServicios().stream().map(sub -> {
             AppointmentServiceDetail d = new AppointmentServiceDetail();
             d.setNombre(sub.nombre());
@@ -95,26 +89,22 @@ public class AppointmentController {
                 hairdressingServiceRepository.findById(sub.servicioBaseId())
                         .ifPresent(d::setServicioBase);
             }
+            d.setAppointment(appointment); // <-- vincular la cita ANTES de guardar
             return d;
         }).toList();
 
-        detalles.forEach(d -> d.setAppointment(appointment)); // ⬅️ esto es lo clave
+        appointment.setAppointmentServiceDetails(detalles); // set completo
 
-        appointment.setAppointmentServiceDetails(detalles); // ⬅️ antes de guardar
+        // Guardar cita y subservicios de forma atómica
+        Appointment created = appointmentService.createAppointment(appointment);
 
+        // Crear orden asociada
+        orderService.createOrder(created.getId());
 
-// 💾 Ahora sí, guarda la cita
-        Appointment newAppointment = appointmentService.createAppointment(appointment);
-
-// 🧾 Crea el pedido
-        orderService.createOrder(newAppointment.getId());
-
-// 📤 Respuesta
-        AppointmentResponseDto response = AppointmentResponseDto.fromEntity(newAppointment);
+        // Devolver respuesta
+        AppointmentResponseDto response = AppointmentResponseDto.fromEntity(created);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
     }
-
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('ADMIN')")

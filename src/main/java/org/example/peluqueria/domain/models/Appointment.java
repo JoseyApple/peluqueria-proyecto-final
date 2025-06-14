@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.example.peluqueria.domain.AppointmentStatus;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,7 @@ public class Appointment {
     @OneToOne
     private Order order;
 
-    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL)
-    private List<AppointmentServiceDetail> appointmentServiceDetails;
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AppointmentServiceDetail> appointmentServiceDetails = new ArrayList<>();
+
 }
