@@ -32,22 +32,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public Appointment createAppointment(Appointment appointment) {
+        
         LocalDateTime startDateTime = appointment.getStartTime();
-        LocalDateTime endDateTime = appointment.getEndTime(); // ← usar el que viene del controller
+        LocalDateTime endDateTime = getLocalDateTime(appointment, startDateTime);
 
-        boolean tieneServiciosTradicionales = appointment.getServices() != null && !appointment.getServices().isEmpty();
-        boolean tieneSubServicios = appointment.getAppointmentServiceDetails() != null && !appointment.getAppointmentServiceDetails().isEmpty();
-
-        if (!tieneServiciosTradicionales && !tieneSubServicios) {
-            throw new IllegalArgumentException("Debe seleccionar al menos un subservicio o servicio base.");
-        }
-
-
-        if (startDateTime == null || endDateTime == null) {
-            throw new IllegalArgumentException("startTime y endTime no pueden ser nulos.");
-        }
-
-        // Validar que esté dentro del horario
         LocalTime startTime = startDateTime.toLocalTime();
         LocalTime endTime = endDateTime.toLocalTime();
 
@@ -65,8 +53,24 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         appointment.setStatus(AppointmentStatus.PENDING);
 
-        // ✅ ¡No vuelvas a tocar el endTime!
         return appointmentRepository.save(appointment);
+    }
+
+    private static LocalDateTime getLocalDateTime(Appointment appointment, LocalDateTime startDateTime) {
+        LocalDateTime endDateTime = appointment.getEndTime(); // ← usar el que viene del controller
+
+        boolean tieneServiciosTradicionales = appointment.getServices() != null && !appointment.getServices().isEmpty();
+        boolean tieneSubServicios = appointment.getAppointmentServiceDetails() != null && !appointment.getAppointmentServiceDetails().isEmpty();
+
+        if (!tieneServiciosTradicionales && !tieneSubServicios) {
+            throw new IllegalArgumentException("Debe seleccionar al menos un subservicio o servicio base.");
+        }
+
+
+        if (startDateTime == null || endDateTime == null) {
+            throw new IllegalArgumentException("startTime y endTime no pueden ser nulos.");
+        }
+        return endDateTime;
     }
 
     @Override
