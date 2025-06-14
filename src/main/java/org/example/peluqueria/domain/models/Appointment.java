@@ -16,6 +16,7 @@ public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
@@ -30,4 +31,7 @@ public class Appointment {
 
     @OneToOne
     private Order order;
+
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL)
+    private List<AppointmentServiceDetail> appointmentServiceDetails;
 }

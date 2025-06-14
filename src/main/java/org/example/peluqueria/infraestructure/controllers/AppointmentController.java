@@ -12,7 +12,6 @@ import org.example.peluqueria.domain.OrderStatus;
 import org.example.peluqueria.domain.models.AppUser;
 import org.example.peluqueria.domain.models.Appointment;
 import org.example.peluqueria.domain.models.AppointmentServiceDetail;
-import org.example.peluqueria.domain.models.HairdressingService;
 import org.example.peluqueria.infraestructure.criteriabuilders.AppointmentCriteriaBuilder;
 import org.example.peluqueria.infraestructure.dto.PageOutDto;
 import org.example.peluqueria.infraestructure.dto.appointment.AppointmentResponseDto;
@@ -69,6 +68,8 @@ public class AppointmentController {
         Appointment appointment = new Appointment();
         appointment.setStartTime(dto.startTime());
         appointment.setClient(client);
+        appointment.setServices(new ArrayList<>());
+
 
         // ⏱️ Calcular duración total si no se envió `endTime`
         if (dto.endTime() != null) {
@@ -84,12 +85,12 @@ public class AppointmentController {
         Appointment created = appointmentService.createAppointment(appointment);
 
         // 💡 Guardar subservicios personalizados
+// 💡 Guardar subservicios personalizados
         List<AppointmentServiceDetail> detalles = dto.subServicios().stream().map(sub -> {
             AppointmentServiceDetail d = new AppointmentServiceDetail();
             d.setNombre(sub.nombre());
             d.setDuracionMinutos(sub.duracionMinutos());
             d.setPrecio(sub.precio());
-            d.setAppointment(created);
             if (sub.servicioBaseId() != null) {
                 hairdressingServiceRepository.findById(sub.servicioBaseId())
                         .ifPresent(d::setServicioBase);
@@ -97,14 +98,21 @@ public class AppointmentController {
             return d;
         }).toList();
 
-        appointmentServiceDetailRepository.saveAll(detalles);
+        detalles.forEach(d -> d.setAppointment(appointment)); // ⬅️ esto es lo clave
 
-        // 🧾 Crear pedido
-        orderService.createOrder(created.getId());
+        appointment.setAppointmentServiceDetails(detalles); // ⬅️ antes de guardar
 
-        // 📤 Devolver respuesta
-        AppointmentResponseDto response = AppointmentResponseDto.fromEntity(created);
+
+// 💾 Ahora sí, guarda la cita
+        Appointment newAppointment = appointmentService.createAppointment(appointment);
+
+// 🧾 Crea el pedido
+        orderService.createOrder(newAppointment.getId());
+
+// 📤 Respuesta
+        AppointmentResponseDto response = AppointmentResponseDto.fromEntity(newAppointment);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
     }
 
 

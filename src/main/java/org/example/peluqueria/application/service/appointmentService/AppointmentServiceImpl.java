@@ -35,9 +35,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         LocalDateTime startDateTime = appointment.getStartTime();
         LocalDateTime endDateTime = appointment.getEndTime(); // ← usar el que viene del controller
 
-        if (appointment.getServices() == null || appointment.getServices().isEmpty()) {
-            throw new IllegalArgumentException("Debe seleccionar al menos un servicio.");
+        boolean tieneServiciosTradicionales = appointment.getServices() != null && !appointment.getServices().isEmpty();
+        boolean tieneSubServicios = appointment.getAppointmentServiceDetails() != null && !appointment.getAppointmentServiceDetails().isEmpty();
+
+        if (!tieneServiciosTradicionales && !tieneSubServicios) {
+            throw new IllegalArgumentException("Debe seleccionar al menos un subservicio o servicio base.");
         }
+
 
         if (startDateTime == null || endDateTime == null) {
             throw new IllegalArgumentException("startTime y endTime no pueden ser nulos.");
