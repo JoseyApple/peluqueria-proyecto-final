@@ -37,10 +37,17 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("Ya existe una factura para esta cita.");
         }
 
-        BigDecimal totalAmount = appointment.getServices()
+        BigDecimal totalAmount = appointment.getAppointmentServiceDetails()
                 .stream()
-                .map(HairdressingService::getPrice)
+                .map(d -> {
+                    try {
+                        return new BigDecimal(d.getPrecio().replace("€", "").replace(" ", "").trim());
+                    } catch (NumberFormatException e) {
+                        return BigDecimal.ZERO; // o lanzar excepción si prefieres
+                    }
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
 
         Order order = new Order();
         order.setCreatedAt(LocalDateTime.now());

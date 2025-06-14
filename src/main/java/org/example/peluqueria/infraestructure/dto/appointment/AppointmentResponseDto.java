@@ -22,6 +22,16 @@ public record AppointmentResponseDto(
                 .map(HairdressingService::getName)
                 .toList();
 
+        OrderResponseDto orderDto = null;
+
+        if (appointment.getOrder() != null) {
+            orderDto = new OrderResponseDto(
+                    appointment.getOrder().getId(),
+                    appointment.getOrder().getTotalAmount(),
+                    appointment.getOrder().getStatus().name()
+            );
+        }
+
         return new AppointmentResponseDto(
                 appointment.getId(),
                 appointment.getClient().getId(),
@@ -29,12 +39,9 @@ public record AppointmentResponseDto(
                 appointment.getEndTime(),
                 serviceNames,
                 appointment.getStatus().name(),
-                new OrderResponseDto(
-                        appointment.getOrder().getId(),
-                        appointment.getOrder().getTotalAmount(),
-                        appointment.getOrder().getStatus().name()
-                )
+                orderDto
         );
     }
+
 }
 

@@ -60,16 +60,19 @@ public class AppointmentController {
             @Valid @RequestBody CreateAppointmentDto dto,
             @AuthenticationPrincipal UserPrincipal currentUser) {
 
+        // Validar permisos
         securityUtils.assertSameUserOrAdmin(currentUser, dto.clientId());
 
+        // Buscar cliente
         AppUser client = appUserService.findById(dto.clientId());
 
+        // Crear objeto cita
         Appointment appointment = new Appointment();
         appointment.setStartTime(dto.startTime());
         appointment.setClient(client);
-        appointment.setServices(new ArrayList<>()); // sin servicios clásicos
+        appointment.setServices(new ArrayList<>());
 
-        // Calcular endTime si no se pasó explícitamente
+        // Calcular endTime
         if (dto.endTime() != null) {
             appointment.setEndTime(dto.endTime());
         } else {
@@ -89,22 +92,27 @@ public class AppointmentController {
                 hairdressingServiceRepository.findById(sub.servicioBaseId())
                         .ifPresent(d::setServicioBase);
             }
-            d.setAppointment(appointment); // <-- vincular la cita ANTES de guardar
+            d.setAppointment(appointment);
             return d;
         }).toList();
 
-        appointment.setAppointmentServiceDetails(detalles); // set completo
+        appointment.setAppointmentServiceDetails(detalles);
 
-        // Guardar cita y subservicios de forma atómica
-        Appointment created = appointmentService.createAppointment(appointment);
+        // Guardar la cita
+        Appointment savedAppointment = appointmentService.createAppointment(appointment);
 
-        // Crear orden asociada
-        orderService.createOrder(created.getId());
+        // Crear la orden
+        orderService.createOrder(savedAppointment.getId());
 
-        // Devolver respuesta
-        AppointmentResponseDto response = AppointmentResponseDto.fromEntity(created);
+        // 🔄 Recargar la cita con la orden
+        Appointment citaConOrden = appointmentRepository.findWithOrderById(savedAppointment.getId())
+                .orElseThrow(() -> new RuntimeException("No se pudo recargar la cita con la orden"));
+
+        // Devolver DTO con la orden ya presente
+        AppointmentResponseDto response = AppointmentResponseDto.fromEntity(citaConOrden);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('ADMIN')")

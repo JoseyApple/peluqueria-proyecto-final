@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
@@ -47,5 +48,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     );
 
     List<Appointment> findAllByStartTimeBetween(LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT a FROM Appointment a LEFT JOIN FETCH a.order WHERE a.id = :id")
+    Optional<Appointment> findWithOrderById(@Param("id") Long id);
+
 
 }

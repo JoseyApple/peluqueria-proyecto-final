@@ -64,10 +64,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 				}
 
 				UsernamePasswordAuthenticationToken authentication =
-						new UsernamePasswordAuthenticationToken(
-								userDetails, null, userDetails.getAuthorities());
-				authentication.setDetails(new WebAuthenticationDetailsSource()
-						.buildDetails(request));
+						new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 
@@ -75,9 +73,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 		} catch (ExpiredJwtException eje) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired");
-		} catch (JwtException | IllegalArgumentException e) {
+		} catch (JwtException e) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
 		}
+
 	}
 
-}
+	}

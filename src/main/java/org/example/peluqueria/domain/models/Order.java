@@ -29,7 +29,9 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    @OneToOne(mappedBy = "order")
+    @OneToOne
+    @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     private Appointment appointment;
+
 
 }
