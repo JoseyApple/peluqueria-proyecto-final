@@ -9,7 +9,6 @@ import org.example.peluqueria.domain.models.HairdressingService;
 import org.example.peluqueria.exceptions.EntityNotFoundException;
 import org.example.peluqueria.exceptions.InvalidAppointmentStatusException;
 import org.example.peluqueria.infraestructure.repositories.AppointmentRepository;
-import org.example.peluqueria.infraestructure.repositories.HairdressingServiceRepository;
 import org.example.peluqueria.infraestructure.utils.TimeUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -114,12 +113,11 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public int contarCitasPendientesDelDia(LocalDate fecha) {
-        LocalDateTime inicio = fecha.atStartOfDay();         // 00:00
-        LocalDateTime fin = fecha.atTime(23, 59, 59);        // 23:59:59
+    public int contarCitasPendientesDesde(LocalDate fecha) {
+        LocalDateTime inicio = fecha.atStartOfDay(); // 00:00 del día dado
 
-        return appointmentRepository.countAllByStatusAndStartTimeBetween(
-                AppointmentStatus.PENDING, inicio, fin
+        return appointmentRepository.countAllByStatusAndStartTimeAfter(
+                AppointmentStatus.PENDING, inicio
         );
     }
 

@@ -24,7 +24,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     boolean existsByStartTimeLessThanAndEndTimeGreaterThanAndStatusNot(
             LocalDateTime endTime, LocalDateTime startTime, AppointmentStatus status);
 
-    int countAllByStatusAndStartTimeBetween(AppointmentStatus status, LocalDateTime start, LocalDateTime end);
+    int countAllByStatusAndStartTimeAfter(AppointmentStatus status, LocalDateTime startTime);
 
     @Modifying
     @Query("""

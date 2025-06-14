@@ -162,11 +162,11 @@ public class AppointmentController {
 
     @GetMapping("/pending-appointments/{date}")
     @Operation(
-            summary = "Contar citas pendientes por día",
-            description = "Devuelve el número de citas pendientes para una fecha específica proporcionada en el path."
+            summary = "Contar citas pendientes desde una fecha",
+            description = "Devuelve el número de citas pendientes a partir de la fecha proporcionada (inclusive)."
     )
     public ResponseEntity<Integer> getPendingAppointments(@PathVariable LocalDate date) {
-        return ResponseEntity.ok(appointmentService.contarCitasPendientesDelDia(date));
+        return ResponseEntity.ok(appointmentService.contarCitasPendientesDesde(date));
     }
 
     @GetMapping("/client-availability/{clientId}")
