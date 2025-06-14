@@ -43,7 +43,6 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new IllegalArgumentException("La cita está fuera del horario de apertura.");
         }
 
-        // Validar conflictos
         boolean conflict = appointmentRepository.existsByStartTimeLessThanAndEndTimeGreaterThanAndStatusNot(
                 endDateTime, startDateTime, AppointmentStatus.CANCELLED);
 
@@ -57,7 +56,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     private static LocalDateTime getLocalDateTime(Appointment appointment, LocalDateTime startDateTime) {
-        LocalDateTime endDateTime = appointment.getEndTime(); // ← usar el que viene del controller
+
+        LocalDateTime endDateTime = appointment.getEndTime();
 
         boolean tieneServiciosTradicionales = appointment.getServices() != null && !appointment.getServices().isEmpty();
         boolean tieneSubServicios = appointment.getAppointmentServiceDetails() != null && !appointment.getAppointmentServiceDetails().isEmpty();

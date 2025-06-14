@@ -12,6 +12,7 @@ import org.example.peluqueria.domain.OrderStatus;
 import org.example.peluqueria.domain.models.AppUser;
 import org.example.peluqueria.domain.models.Appointment;
 import org.example.peluqueria.domain.models.AppointmentServiceDetail;
+import org.example.peluqueria.domain.models.Order;
 import org.example.peluqueria.infraestructure.criteriabuilders.AppointmentCriteriaBuilder;
 import org.example.peluqueria.infraestructure.dto.PageOutDto;
 import org.example.peluqueria.infraestructure.dto.appointment.AppointmentResponseDto;
@@ -101,15 +102,14 @@ public class AppointmentController {
         // Guardar la cita
         Appointment savedAppointment = appointmentService.createAppointment(appointment);
 
-        // Crear la orden
-        orderService.createOrder(savedAppointment.getId());
+        Order newOrder = orderService.createOrder(savedAppointment.getId());
 
-        // 🔄 Recargar la cita con la orden
-        Appointment citaConOrden = appointmentRepository.findWithOrderById(savedAppointment.getId())
-                .orElseThrow(() -> new RuntimeException("No se pudo recargar la cita con la orden"));
+        appointment.setOrder(newOrder);
+
+        appointmentRepository.save(appointment);
 
         // Devolver DTO con la orden ya presente
-        AppointmentResponseDto response = AppointmentResponseDto.fromEntity(citaConOrden);
+        AppointmentResponseDto response = AppointmentResponseDto.fromEntity(appointment);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
