@@ -64,6 +64,10 @@ public class AppointmentController {
         AppUser client = appUserService.findById(dto.clientId());
         List<HairdressingService> services = hairdressingServiceRepository.findAllById(dto.serviceIds());
 
+        if (services == null || services.isEmpty()) {
+            throw new IllegalArgumentException("Debe seleccionar al menos un servicio válido.");
+        }
+
         Appointment appointment = new Appointment();
         appointment.setStartTime(dto.startTime());
         appointment.setClient(client);
