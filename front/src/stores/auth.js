@@ -38,7 +38,8 @@ async fetchCurrentUser() {
 
     async login(credentials) {
       try {
-        const { data } = await axios.post('http://localhost:8081/auth/login', credentials)
+        // Usa la instancia axios importada, sin URL completa
+        const { data } = await axios.post('/auth/login', credentials)
 
         const token = data.token
         localStorage.setItem('jwt_token', token)
@@ -50,7 +51,6 @@ async fetchCurrentUser() {
         throw error
       }
     },
-
     logout() {
       this.user = null
       localStorage.removeItem('user')
