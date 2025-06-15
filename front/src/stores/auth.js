@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import axios from '@/api/axiosInstance'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -14,9 +14,7 @@ export const useAuthStore = defineStore('auth', {
       }
 
       try {
-        const { data } = await axios.get('https://peluqueria-proyecto-final.onrender.com/users/me', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        const { data } = await axios.get('/users/me')  // <-- ruta relativa
 
         this.user = {
           id: data.id,
@@ -37,7 +35,7 @@ export const useAuthStore = defineStore('auth', {
 
     async login(credentials) {
       try {
-        const { data } = await axios.post('https://peluqueria-proyecto-final.onrender.com/auth/login', credentials)
+        const { data } = await axios.post('/auth/login', credentials)  // <-- ruta relativa
 
         const token = data.token
         localStorage.setItem('jwt_token', token)
@@ -60,4 +58,3 @@ export const useAuthStore = defineStore('auth', {
   }
 })
 
-// comentarios

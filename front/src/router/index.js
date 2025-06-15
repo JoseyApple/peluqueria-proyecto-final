@@ -37,25 +37,36 @@ const BASE_URL = '/';
 const router = createRouter({
   history: createWebHistory(BASE_URL),
   routes,
-
   scrollBehavior(to, from, savedPosition) {
     return { left: 0, top: 0 };
   }
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore();
-  const token = localStorage.getItem("jwt_token");
 
-  if (to.meta.requiresAuth && !token) {
+  // Si no se ha cargado el usuario, intenta cargarlo
+  if (!auth.user && localStorage.getItem('jwt_token')) {
+    try {
+      await auth.fetchCurrentUser();
+    } catch {
+      // Si falla la carga, redirige a login
+      return next('/login');
+    }
+  }
+
+  // Verifica si ruta requiere autenticación y el usuario está autenticado
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return next('/login');
   }
 
-  if (to.meta.adminOnly && auth.user?.role !== 'ADMIN') {
-    return next('/'); 
+  // Verifica acceso admin
+  if (to.meta.adminOnly && (!auth.user || auth.user.role !== 'ADMIN')) {
+    return next('/');
   }
 
   next();
 });
 
 export default router;
+
