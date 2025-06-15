@@ -3,7 +3,7 @@ import router from '@/router'
 import { useAuthStore } from '@/stores/auth'
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8081'
+  baseURL: 'https://peluqueria-proyecto-final.onrender.com'
 })
 
 axiosInstance.interceptors.request.use(config => {
@@ -12,22 +12,22 @@ axiosInstance.interceptors.request.use(config => {
     config.headers.Authorization = `Bearer ${token}`
   }
   return config
-}, error => {
-  return Promise.reject(error)
-})
+}, error => Promise.reject(error))
 
 axiosInstance.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response?.status === 401) {
-      const auth = useAuthStore()
-      auth.logout() 
-      if (router.currentRoute.value.path !== '/login') {
-        router.push('/login')
+    response => response,
+    error => {
+      if (error.response?.status === 401) {
+        const auth = useAuthStore()  // Importa aquí para evitar problemas
+        auth.logout()
+        if (router.currentRoute.value.path !== '/login') {
+          router.push('/login')
+        }
       }
+      return Promise.reject(error)
     }
-    return Promise.reject(error)
-  }
 )
 
 export default axiosInstance
+
+

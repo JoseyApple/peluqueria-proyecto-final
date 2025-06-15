@@ -70,12 +70,8 @@ const { showModal } = useModal()
 const reservas = ref([])
 
 const fetchReservas = async () => {
-  const token = localStorage.getItem('jwt_token')
-  if (!token) return
-
   try {
-    const response = await axios.get('http://localhost:8081/appointments/search', {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await axios.get('/appointments/search', {
       params: { page: 0, size: 100 }
     })
 
@@ -92,14 +88,11 @@ const fetchReservas = async () => {
   }
 }
 
-const confirmarReserva = async (reserva) => {
-  const token = localStorage.getItem('jwt_token')
-  if (!token) return
+import axios from '@/api/axiosInstance'
 
+const confirmarReserva = async (reserva) => {
   try {
-    await axios.patch(`http://localhost:8081/appointments/${reserva.id}?newStatus=CONFIRMED`, {}, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    await axios.patch(`/appointments/${reserva.id}?newStatus=CONFIRMED`, {})
 
     reserva.status = 'CONFIRMED'
     reserva.recentlyConfirmed = true
@@ -123,9 +116,6 @@ const confirmarReserva = async (reserva) => {
 }
 
 const cancelarReserva = async (reserva) => {
-  const token = localStorage.getItem('jwt_token')
-  if (!token) return
-
   const confirmacion = await showModal({
     type: 'confirm',
     title: 'Confirmar cancelación',
@@ -135,11 +125,7 @@ const cancelarReserva = async (reserva) => {
   if (!confirmacion) return
 
   try {
-    await axios.patch(
-      `http://localhost:8081/appointments/${reserva.id}?newStatus=CANCELLED`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
+    await axios.patch(`/appointments/${reserva.id}?newStatus=CANCELLED`, {})
 
     reserva.status = 'CANCELLED'
 

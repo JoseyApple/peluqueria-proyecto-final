@@ -55,7 +55,7 @@ const handleRegister = async () => {
 
   loading.value = true;
   try {
-    await axios.post("http://localhost:8081/users", {
+    await axios.post("/users", {  // ya no hace falta poner la URL completa
       userName: nombre.value,
       email: email.value,
       password: password.value,

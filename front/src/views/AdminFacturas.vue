@@ -43,7 +43,7 @@ const facturas = ref([])
 const fetchFacturas = async () => {
   const token = localStorage.getItem('jwt_token')
   try {
-    const response = await axios.get('http://localhost:8081/orders', {
+    const response = await axios.get('/orders', {
       headers: { Authorization: `Bearer ${token}` }
     })
     facturas.value = response.data.content.filter(
@@ -59,15 +59,9 @@ const fetchFacturas = async () => {
 }
 
 const confirmarPago = async (id) => {
-  const token = localStorage.getItem('jwt_token')
   try {
-    await axios.patch(
-      `http://localhost:8081/orders/${id}?newStatus=PAID`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    )
+    await axios.patch(`/orders/${id}?newStatus=PAID`, {})
+
     const factura = facturas.value.find(f => f.id === id)
     if (factura) factura.status = 'PAID'
 

@@ -14,7 +14,7 @@ async fetchCurrentUser() {
   }
 
   try {
-    const { data } = await axios.get('http://localhost:8081/users/me', {
+    const { data } = await axios.get('/users/me', {
       headers: { Authorization: `Bearer ${token}` }
     })
 

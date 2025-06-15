@@ -27,7 +27,7 @@ const email = ref('')
 const password = ref('')
 const router = useRouter()
 const auth = useAuthStore()
-const { showModal } = useModal() 
+const { showModal } = useModal()
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
@@ -35,21 +35,22 @@ const handleLogin = async () => {
       type: 'alert',
       title: 'Campos incompletos',
       message: 'Por favor, completa todos los campos antes de continuar.'
-    })
-    return
+    });
+    return;
   }
 
   try {
-    await auth.login({ email: email.value, password: password.value })
-    router.push('/')
-  } catch {
+    await auth.login({ email: email.value, password: password.value });
+    router.push('/');
+  } catch (error) {
     showModal({
       type: 'alert',
       title: 'Error de inicio de sesión',
       message: 'Credenciales incorrectas. Verifica tu email y contraseña.'
-    })
+    });
   }
-}
+};
+
 </script>
 
 
