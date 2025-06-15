@@ -62,7 +62,6 @@
 
 <script setup>
 import { ref, onMounted, onActivated } from 'vue'
-import axios from 'axios'
 import { useModal } from '@/plugins/useModal.js'
 
 const { showModal } = useModal()
