@@ -91,6 +91,109 @@ Authorization: Bearer <token>
 
 ---
 
+Glow Up Studio - Frontend
+----PROYECTO DE VUE 3 + PINIA + VUE ROUTER + AXIOS----
+
+Vistas principales:
+Inicio: Página principal con carrusel y resumen de servicios.
+
+Servicios: Listado de todos los servicios con detalle.
+
+Detalle de Servicio: Información específica y opción para reservar.
+
+Reservas: Gestión y visualización de reservas del usuario.
+
+Administración: Panel para gestión de reservas y facturas (solo admin).
+
+Login / Registro: Autenticación de usuarios.
+
+Factura: Visualización y descarga de facturas.
+
+Sobre Nosotros y Contacto: Información corporativa y contacto.
+
+Descripción del Proyecto
+Glow Up Studio es una aplicación web para gestión y reserva de servicios de belleza y peluquería. Ofrece a los usuarios una experiencia moderna y responsive para consultar servicios, realizar reservas y gestionar facturas. La aplicación está dividida en frontend (Vue 3) y backend (Node.js + Express).
+
+Estructura del Proyecto
+Glow Up Studio
+│
+├── 📂 frontend
+│ ├── 📂 public
+│ ├── 📂 src
+│ │ ├── 📂 api (configuración axios)
+│ │ ├── 📂 components (componentes reutilizables)
+│ │ ├── 📂 plugins (modal, etc.)
+│ │ ├── 📂 stores (Pinia para estado global)
+│ │ ├── 📂 views (vistas / páginas)
+│ │ ├── App.vue
+│ │ ├── main.js
+│ │ ├── router.js
+│ ├── package.json
+│ ├── vite.config.js
+│
+└── 📜 .gitignore
+
+Tecnologías Utilizadas
+Frontend
+
+Vue 3 (Composición API)
+
+Pinia (Gestión de estado)
+
+Vue Router (Navegación)
+
+Axios (Comunicación con backend)
+
+Swiper (Carrusel de imágenes)
+
+jsPDF (Generación de PDFs para facturas)
+
+Vite (Empaquetador y servidor de desarrollo)
+
+Instalación y Configuración
+Clonar el repositorio
+
+git clone https://github.com/tu-usuario/glow-up-studio.git
+cd glow-up-studio/frontend
+Instalar dependencias
+
+npm install
+Configurar backend
+Asegúrate de que el backend esté corriendo en http://localhost:8081 (puedes ajustar la URL en src/api/axiosInstance.js si es necesario).
+
+Ejecutar la aplicación
+
+npm run dev
+La app estará disponible usualmente en http://localhost:5173.
+
+Uso básico
+Regístrate o inicia sesión para reservar servicios.
+
+Navega en la sección de servicios para conocer las opciones disponibles.
+
+Reserva citas con selección de fecha y hora, el sistema verifica disponibilidad.
+
+Visualiza y administra tus reservas y facturas en tu perfil.
+
+Los administradores pueden gestionar todas las reservas y facturas desde el panel de administración.
+
+Despliegue
+Recomendaciones para producción
+Construir la app para producción:
+
+npm run build
+
+Subir los archivos generados en dist/ a tu proveedor de hosting estático (Netlify, Vercel, etc).
+
+Actualizar la URL del backend en src/api/axiosInstance.js si el backend se despliega en otra URL pública.
+
+Notas
+El sistema usa JWT para autenticación. El token se almacena en localStorage.
+
+Algunas operaciones (como confirmaciones y cancelaciones) requieren rol de administrador.
+
+El plugin modal centraliza todas las alertas, confirmaciones y prompts para mejor experiencia.
+
 ## Notas
 
 - Al crear una cita, se genera automáticamente una factura (`Order`) asociada.
