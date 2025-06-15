@@ -1,0 +1,9 @@
+[build]
+base = ""                # raíz del frontend (vacío si estás en la carpeta frontend)
+publish = "dist"         # carpeta donde Vue genera los archivos build
+command = "npm run build" # comando para compilar el proyecto
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
