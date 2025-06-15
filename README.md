@@ -2,6 +2,9 @@
 
 Backend para la gestión de una peluquería, desarrollado en **Java con Spring Boot**. Este sistema permite gestionar usuarios, citas, servicios y facturas, con autenticación basada en **JWT**.
 
+https://glowupstudio-main.netlify.app/ <---- Página web
+https://peluqueria-proyecto-final.onrender.com/swagger-ui/index.html <---- Swagger
+
 ---
 
 ## 🛠️ Tecnologías Utilizadas
