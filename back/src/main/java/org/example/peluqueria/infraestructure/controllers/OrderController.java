@@ -3,8 +3,12 @@ package org.example.peluqueria.infraestructure.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.example.peluqueria.application.service.appointmentService.AppointmentService;
+import org.example.peluqueria.application.service.appointmentService.AppointmentServiceImpl;
 import org.example.peluqueria.application.service.order.OrderService;
+import org.example.peluqueria.domain.AppointmentStatus;
 import org.example.peluqueria.domain.OrderStatus;
+import org.example.peluqueria.domain.models.Appointment;
 import org.example.peluqueria.domain.models.Order;
 import org.example.peluqueria.infraestructure.dto.PageOutDto;
 import org.example.peluqueria.infraestructure.dto.order.OrderResponseDto;
@@ -29,6 +33,7 @@ public class OrderController {
 
     private final OrderService orderService;
     private final SecurityUtils securityUtils;
+    private final AppointmentService appointmentService;
 
     @PatchMapping("/{id}")
     @Operation(
@@ -40,6 +45,16 @@ public class OrderController {
             @RequestParam("newStatus") String newStatus) {
 
         orderService.changeOrderStatus(id, newStatus);
+
+        if (newStatus.equals("PAID")) {
+            Order order = orderService.findById(id);
+            Appointment appointment = order.getAppointment();
+            if (appointment != null && appointment.getStatus() != AppointmentStatus.CANCELLED) {
+                appointment.setStatus(AppointmentStatus.COMPLETED);
+                appointmentService.save(appointment);
+            }
+        }
+
         return ResponseEntity.noContent().build();
     }
 

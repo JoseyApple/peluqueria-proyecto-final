@@ -79,7 +79,6 @@ public class AppointmentController {
 
 
     @GetMapping("/search")
-    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Buscar citas (ADMIN)",
             description = "Permite a un administrador buscar citas filtrando por fecha, hora, estado, correo del cliente, estado del pedido y monto mínimo del pedido, con paginación."
@@ -185,7 +184,9 @@ public class AppointmentController {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 
-        List<Appointment> appointments = appointmentRepository.findAllByStartTimeBetween(startOfDay, endOfDay);
+        // ⚠️ Solo traer citas que NO están canceladas
+        List<Appointment> appointments = appointmentRepository
+                .findAllByStartTimeBetweenAndStatusNot(startOfDay, endOfDay, AppointmentStatus.CANCELLED);
 
         List<AppointmentResponseDto2> response = appointments.stream()
                 .map(AppointmentResponseDto2::fromEntity)
@@ -193,4 +194,5 @@ public class AppointmentController {
 
         return ResponseEntity.ok(response);
     }
+
 }

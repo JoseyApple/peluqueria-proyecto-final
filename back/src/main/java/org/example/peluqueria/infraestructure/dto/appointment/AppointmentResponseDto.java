@@ -29,11 +29,8 @@ public record AppointmentResponseDto(
                 appointment.getEndTime(),
                 serviceNames,
                 appointment.getStatus().name(),
-                new OrderResponseDto(
-                        appointment.getOrder().getId(),
-                        appointment.getOrder().getTotalAmount(),
-                        appointment.getOrder().getStatus().name()
-                )
+                OrderResponseDto.fromEntity(appointment.getOrder())
+
         );
     }
 }

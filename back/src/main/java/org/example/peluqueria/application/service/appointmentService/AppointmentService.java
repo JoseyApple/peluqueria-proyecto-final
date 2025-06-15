@@ -20,4 +20,6 @@ public interface AppointmentService {
     int contarCitasPendientesDesde(LocalDate fecha);
 
     boolean existenCitasHoy(Long clientId);
+
+    Appointment save(Appointment appointment);
 }

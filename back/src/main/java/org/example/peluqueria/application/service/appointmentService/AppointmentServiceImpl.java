@@ -30,6 +30,12 @@ public class AppointmentServiceImpl implements AppointmentService {
             AppointmentStatus.COMPLETED.name(), AppointmentStatus.CONFIRMED.name());
 
     @Override
+    public Appointment save(Appointment appointment) {
+        return appointmentRepository.save(appointment);
+    }
+
+
+    @Override
     public Appointment createAppointment(Appointment appointment) {
         LocalDateTime startDateTime = appointment.getStartTime();
 
@@ -77,29 +83,30 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .orElseThrow(() -> new EntityNotFoundException("Cita no encontrada."));
 
         if (!appointmentStatuses.contains(newStatus.toUpperCase())) {
-
             throw new InvalidAppointmentStatusException("El estado de cita indicado no existe");
         }
 
         AppointmentStatus currentStatus = appointment.getStatus();
+        AppointmentStatus requestedStatus = AppointmentStatus.valueOf(newStatus.toUpperCase());
 
-        if (currentStatus.name().equalsIgnoreCase(newStatus)) {
+        if (currentStatus == requestedStatus) {
             throw new IllegalStateException("La cita ya está en el estado solicitado.");
         }
 
-        // Lógica de transición válida
+        // ❌ No permitir volver a activar una cita cancelada
         if (currentStatus == AppointmentStatus.CANCELLED) {
-            throw new IllegalStateException("No se puede cambiar el estado de una cita cancelada.");
+            throw new IllegalStateException("No se puede modificar una cita que ya fue cancelada.");
         }
 
-        if (currentStatus == AppointmentStatus.COMPLETED && !newStatus.equalsIgnoreCase(AppointmentStatus.CANCELLED.name())) {
+        // ❌ No permitir modificar una cita completada (salvo cancelarla)
+        if (currentStatus == AppointmentStatus.COMPLETED && requestedStatus != AppointmentStatus.CANCELLED) {
             throw new IllegalStateException("No se puede modificar una cita completada.");
         }
 
-        appointment.setStatus(AppointmentStatus.valueOf(newStatus));
+        // ✅ Solo actualizar el estado
+        appointment.setStatus(requestedStatus);
         appointmentRepository.save(appointment);
     }
-
 
     @Override
     public Page<Appointment> getAppointmentsByClient(Long clientId, Pageable pageable) {
