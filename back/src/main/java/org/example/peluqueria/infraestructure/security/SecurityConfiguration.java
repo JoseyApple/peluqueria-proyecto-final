@@ -39,7 +39,10 @@ public class SecurityConfiguration {
 		http
 				.cors(cors -> cors.configurationSource(request -> {
 					var config = new org.springframework.web.cors.CorsConfiguration();
-					config.setAllowedOrigins(List.of("http://localhost:5173")); // FRONTEND ORIGIN
+					config.setAllowedOrigins(List.of(
+							"http://localhost:5173",
+							"https://glowupstudio-main.netlify.app"
+					));
 					config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 					config.setAllowedHeaders(List.of("*"));
 					config.setAllowCredentials(true);
