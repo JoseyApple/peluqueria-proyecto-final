@@ -1,18 +1,21 @@
-# GlowUpStudio - Backend
+# Glow Up Studio - Backend
 
-Backend para la gestión de una peluquería, desarrollado en Java con Spring Boot. Permite gestionar usuarios, citas, servicios y facturas, con autenticación basada en JWT.
-
-## Requisitos
-
-- Java 17 o superior
-- Maven 3.8+
-- MySQL Server
-- (Opcional) H2 para pruebas locales
-- Postman o Swagger para pruebas de endpoints
+Backend para la gestión de una peluquería, desarrollado en **Java con Spring Boot**. Este sistema permite gestionar usuarios, citas, servicios y facturas, con autenticación basada en **JWT**.
 
 ---
 
-## Instalación
+## 🛠️ Tecnologías Utilizadas
+
+- Java 17+
+- Spring Boot
+- MySQL / H2 (opcional para pruebas)
+- Maven 3.8+
+- JWT para autenticación
+- Swagger para documentación de API
+
+---
+
+## 🚀 Instalación y Ejecución
 
 ### 1. Clonar el repositorio
 
@@ -21,17 +24,15 @@ git clone https://github.com/tuusuario/glowupstudio-backend.git
 cd glowupstudio-backend
 ```
 
-### 2. Configurar base de datos
-
-Crea una base de datos en MySQL:
+### 2. Crear base de datos en MySQL
 
 ```sql
 CREATE DATABASE glowupstudio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### 3. Editar archivo `application.yml`
+### 3. Configurar archivo `application.yml`
 
-Ubica o crea el archivo `src/main/resources/application.yml` con el siguiente contenido:
+Ubicado en `src/main/resources/application.yml`:
 
 ```yaml
 spring:
@@ -65,25 +66,22 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-> Por defecto, el backend se ejecuta en `http://localhost:8081`.
+> 📍 Por defecto, el backend se ejecuta en: `http://localhost:8081`
 
 ---
 
-## Herramientas disponibles
+## 🔐 Seguridad y Autenticación
 
-- **Swagger UI**: [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html)
-- **H2 Console** (solo si activas H2): [http://localhost:8081/h2-console](http://localhost:8081/h2-console)
+El backend utiliza JWT para autenticar y autorizar peticiones.
 
----
+### Endpoints públicos
 
-## Seguridad y autenticación
-
-La autenticación se realiza mediante JWT. Se proporcionan los siguientes endpoints públicos:
-
-- `POST /auth/login` - Autenticación
+- `POST /auth/login` - Iniciar sesión
 - `POST /users` - Registro de nuevo usuario
 
-Tras autenticarse, se debe incluir el token en las peticiones protegidas con:
+### Endpoints protegidos
+
+Incluir el token JWT en la cabecera de autorización:
 
 ```http
 Authorization: Bearer <token>
@@ -91,110 +89,70 @@ Authorization: Bearer <token>
 
 ---
 
-Glow Up Studio - Frontend
-----PROYECTO DE VUE 3 + PINIA + VUE ROUTER + AXIOS----
+## 🧪 Herramientas para pruebas
 
-Vistas principales:
-Inicio: Página principal con carrusel y resumen de servicios.
+- **Swagger UI**: [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html)
+- **H2 Console** (si está activado): [http://localhost:8081/h2-console](http://localhost:8081/h2-console)
 
-Servicios: Listado de todos los servicios con detalle.
+---
 
-Detalle de Servicio: Información específica y opción para reservar.
-
-Reservas: Gestión y visualización de reservas del usuario.
-
-Administración: Panel para gestión de reservas y facturas (solo admin).
-
-Login / Registro: Autenticación de usuarios.
-
-Factura: Visualización y descarga de facturas.
-
-Sobre Nosotros y Contacto: Información corporativa y contacto.
-
-Descripción del Proyecto
-Glow Up Studio es una aplicación web para gestión y reserva de servicios de belleza y peluquería. Ofrece a los usuarios una experiencia moderna y responsive para consultar servicios, realizar reservas y gestionar facturas. La aplicación está dividida en frontend (Vue 3) y backend (Node.js + Express).
-
-Estructura del Proyecto
-Glow Up Studio
-│
-├── 📂 frontend
-│ ├── 📂 public
-│ ├── 📂 src
-│ │ ├── 📂 api (configuración axios)
-│ │ ├── 📂 components (componentes reutilizables)
-│ │ ├── 📂 plugins (modal, etc.)
-│ │ ├── 📂 stores (Pinia para estado global)
-│ │ ├── 📂 views (vistas / páginas)
-│ │ ├── App.vue
-│ │ ├── main.js
-│ │ ├── router.js
-│ ├── package.json
-│ ├── vite.config.js
-│
-└── 📜 .gitignore
-
-Tecnologías Utilizadas
-Frontend
-
-Vue 3 (Composición API)
-
-Pinia (Gestión de estado)
-
-Vue Router (Navegación)
-
-Axios (Comunicación con backend)
-
-Swiper (Carrusel de imágenes)
-
-jsPDF (Generación de PDFs para facturas)
-
-Vite (Empaquetador y servidor de desarrollo)
-
-Instalación y Configuración
-Clonar el repositorio
-
-git clone https://github.com/tu-usuario/glow-up-studio.git
-cd glow-up-studio/frontend
-Instalar dependencias
-
-npm install
-Configurar backend
-Asegúrate de que el backend esté corriendo en http://localhost:8081 (puedes ajustar la URL en src/api/axiosInstance.js si es necesario).
-
-Ejecutar la aplicación
-
-npm run dev
-La app estará disponible usualmente en http://localhost:5173.
-
-Uso básico
-Regístrate o inicia sesión para reservar servicios.
-
-Navega en la sección de servicios para conocer las opciones disponibles.
-
-Reserva citas con selección de fecha y hora, el sistema verifica disponibilidad.
-
-Visualiza y administra tus reservas y facturas en tu perfil.
-
-Los administradores pueden gestionar todas las reservas y facturas desde el panel de administración.
-
-Despliegue
-Recomendaciones para producción
-Construir la app para producción:
-
-npm run build
-
-Subir los archivos generados en dist/ a tu proveedor de hosting estático (Netlify, Vercel, etc).
-
-Actualizar la URL del backend en src/api/axiosInstance.js si el backend se despliega en otra URL pública.
-
-Notas
-El sistema usa JWT para autenticación. El token se almacena en localStorage.
-
-Algunas operaciones (como confirmaciones y cancelaciones) requieren rol de administrador.
-
-El plugin modal centraliza todas las alertas, confirmaciones y prompts para mejor experiencia.
-
-## Notas
+## 🧾 Notas Importantes
 
 - Al crear una cita, se genera automáticamente una factura (`Order`) asociada.
-- Las citas se marcan automáticamente como expiradas si no se confirman antes de su horario.
+- Las citas se marcan como expiradas si no se confirman antes de su horario.
+
+---
+
+## 🌐 Proyecto Frontend
+
+El frontend está desarrollado en **Vue 3**, utilizando **Pinia**, **Vue Router** y **Axios**.
+
+### Principales vistas
+
+- **Inicio**: Página principal con carrusel e información de servicios.
+- **Servicios**: Listado y detalle de servicios disponibles.
+- **Reservas**: Gestión de reservas del usuario.
+- **Administración**: Panel de administración (solo para admins).
+- **Login / Registro**: Autenticación de usuarios.
+- **Factura**: Visualización y descarga en PDF.
+- **Sobre Nosotros / Contacto**: Información institucional.
+
+### Tecnologías utilizadas
+
+- Vue 3 (Composition API)
+- Pinia (estado global)
+- Vue Router
+- Axios
+- jsPDF (generación de PDFs)
+- Swiper (carrusel)
+- Vite
+
+### Instalación del frontend
+
+```bash
+git clone https://github.com/tu-usuario/glow-up-studio.git
+cd glow-up-studio/frontend
+npm install
+npm run dev
+```
+
+> 🔗 Por defecto, el frontend corre en: `http://localhost:5173`
+
+### Producción
+
+```bash
+npm run build
+```
+
+Sube el contenido de la carpeta `dist/` a tu hosting (Netlify, Vercel, etc). Asegúrate de actualizar la URL del backend en `src/api/axiosInstance.js`.
+
+---
+
+## 📩 Contacto
+
+Para soporte o contribuciones, por favor abre un issue o pull request en el repositorio.
+
+---
+
+© 2025 Glow Up Studio
+
