@@ -178,13 +178,16 @@ public class AppointmentController {
     }
 
     @GetMapping("/times-availability")
+    @Operation(
+            summary = "Lo usa el front para gestionar las citas ocupadas.",
+            description = "Devuelve una lista simple de citas según el día."
+    )
     public ResponseEntity<List<AppointmentResponseDto2>> listarReservasPorDia(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 
-        // ⚠️ Solo traer citas que NO están canceladas
         List<Appointment> appointments = appointmentRepository
                 .findAllByStartTimeBetweenAndStatusNot(startOfDay, endOfDay, AppointmentStatus.CANCELLED);
 
