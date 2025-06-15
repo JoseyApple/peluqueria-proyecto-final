@@ -19,7 +19,7 @@ public class AppointmentCleanupScheduler {
     private final AppointmentRepository appointmentRepository;
     private final OrderRepository orderRepository;
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void marcarCitasVencidas() {
         int actualizadas = appointmentRepository.marcarComoExpiradas(
@@ -29,7 +29,7 @@ public class AppointmentCleanupScheduler {
         );
     }
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void marcarOrdenesVencidas() {
         int actualizadas = orderRepository.actualizarEstadoOrdenesVinculadas(
