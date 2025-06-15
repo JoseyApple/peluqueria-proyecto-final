@@ -62,6 +62,7 @@
 
 <script setup>
 import { ref, onMounted, onActivated } from 'vue'
+import axios from '@/api/axiosInstance'   // Importar primero
 import { useModal } from '@/plugins/useModal.js'
 
 const { showModal } = useModal()
@@ -86,8 +87,6 @@ const fetchReservas = async () => {
     })
   }
 }
-
-import axios from '@/api/axiosInstance'
 
 const confirmarReserva = async (reserva) => {
   try {

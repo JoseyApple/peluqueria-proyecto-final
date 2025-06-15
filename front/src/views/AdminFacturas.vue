@@ -24,7 +24,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import axios from '@/api/axiosInstance'
 import { useAuthStore } from '@/stores/auth'
 import { useModal } from '@/plugins/useModal.js'
 
@@ -32,22 +32,19 @@ const auth = useAuthStore()
 const { showModal } = useModal()
 
 const formatDate = (date) =>
-  new Date(date).toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+    new Date(date).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
 
 const facturas = ref([])
 
 const fetchFacturas = async () => {
-  const token = localStorage.getItem('jwt_token')
   try {
-    const response = await axios.get('/orders', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    const response = await axios.get('/orders')
     facturas.value = response.data.content.filter(
-      f => f.appointmentStatus !== 'CANCELLED'
+        f => f.appointmentStatus !== 'CANCELLED'
     )
   } catch (error) {
     await showModal({
@@ -100,7 +97,6 @@ const traducirEstadoReserva = (estado) => {
 
 onMounted(fetchFacturas)
 </script>
-
 
 <style scoped>
 .facturas-contenedor {
