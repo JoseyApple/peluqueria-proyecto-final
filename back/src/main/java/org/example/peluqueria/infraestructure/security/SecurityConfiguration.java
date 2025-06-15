@@ -59,7 +59,7 @@ public class SecurityConfiguration {
 						).permitAll()
 						.requestMatchers(HttpMethod.POST, "/users").permitAll()
 						.requestMatchers(HttpMethod.GET, "/users/me").authenticated()
-						.requestMatchers(HttpMethod.GET, "/services").permitAll()
+						.requestMatchers(HttpMethod.GET, "/services/**").permitAll()
 						.requestMatchers(HttpMethod.GET, "/appointments/client/**").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.GET, "/appointments/times-availability").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.POST, "/appointments").hasAnyRole("USER", "ADMIN")
