@@ -6,20 +6,9 @@ spring:
   date-format: yyyy-MM-dd'T'HH:mm:ss
   time-zone: UTC
 
- datasource:
-  url: ${SPRING_DATASOURCE_URL}
-  driver-class-name: org.postgresql.Driver
-  username: ${SPRING_DATASOURCE_USERNAME}
-  password: ${SPRING_DATASOURCE_PASSWORD}
-  hikari:
-   maximum-pool-size: 10
-   minimum-idle: 2
-   idle-timeout: 600000
-   max-lifetime: 1800000
-
  jpa:
   hibernate:
-   ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+   ddl-auto: update
   show-sql: true
   properties:
    hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -30,7 +19,7 @@ spring:
    mode: always
 
 server:
- port: 8080 # Render forzará 8080, ignora tu 8081
+ port: 8080  # Render solo permite 8080
 
 security:
  jwt:
@@ -42,6 +31,7 @@ springdoc:
   enabled: true
  api-docs:
   enabled: true
+
 
 
 
