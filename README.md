@@ -12,7 +12,7 @@ https://peluqueria-proyecto-final.onrender.com/swagger-ui/index.html
 
 - Java 17+
 - Spring Boot
-- MySQL / H2 (opcional para pruebas)
+- PostgreSQL / H2 (opcional para pruebas)
 - Maven 3.8+
 - JWT para autenticación
 - Swagger para documentación de API
