@@ -48,7 +48,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		// A PARTIR DE AQUÍ, procesar TODOS los métodos, incluidos GET
 		String authHeader = request.getHeader("Authorization");
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header");
+			filterChain.doFilter(request, response);
 			return;
 		}
 
