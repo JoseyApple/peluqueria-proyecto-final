@@ -6,24 +6,31 @@ spring:
   date-format: yyyy-MM-dd'T'HH:mm:ss
   time-zone: UTC
 
+ datasource:
+  url: ${SPRING_DATASOURCE_URL}
+  username: ${SPRING_DATASOURCE_USERNAME}
+  password: ${SPRING_DATASOURCE_PASSWORD}
+  driver-class-name: org.postgresql.Driver
+
  jpa:
   hibernate:
-   ddl-auto: update
+   ddl-auto: update   # en prod real: validate o none + Flyway
   show-sql: true
   properties:
-   hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+   hibernate:
+    dialect: org.hibernate.dialect.PostgreSQLDialect
   defer-datasource-initialization: true
 
  sql:
   init:
-   mode: always
+   mode: never   # cambia a 'always' solo si usas schema.sql / data.sql
 
 server:
- port: 8080  # Render solo permite 8080
+ port: ${PORT:8080}  # Render asigna PORT por env var
 
 security:
  jwt:
-  secret-key: ${JWT_SECRET:c5cce0a3980ae936bbb7ec9c526f4057043c28b0da0bbb5caca7b713ad2de9df}
+  secret-key: ${JWT_SECRET}
   expiration-time: 3600000
 
 springdoc:
