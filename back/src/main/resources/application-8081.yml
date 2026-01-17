@@ -28,6 +28,10 @@ spring:
 server:
  port: ${PORT:8080}  # Render asigna PORT por env var
 
+logging:
+ level:
+  org.springframework.boot.autoconfigure.jdbc: DEBUG
+
 security:
  jwt:
   secret-key: ${JWT_SECRET}
